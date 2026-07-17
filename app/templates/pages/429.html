@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Too Many Requests - WebShield Scanner{% endblock %}
+
+{% block content %}
+<section class="container py-5 text-center">
+    <h1 class="display-5 fw-bold">Too many requests</h1>
+    <p class="lead">Please wait a moment before trying again.</p>
+    <a class="btn btn-primary" href="{{ url_for('page.dashboard') if current_user.is_authenticated else url_for('page.splash') }}">Go back</a>
+</section>
+{% endblock %}

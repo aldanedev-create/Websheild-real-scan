@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Legal Policy - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .legal-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    .legal-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .legal-header h1 {
+        font-family: 'Orbitron', monospace;
+        color: #00f0ff;
+        font-size: 1.8rem;
+    }
+    .legal-header .last-updated {
+        color: #8899aa;
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+    .legal-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .legal-section h2 {
+        color: #00f0ff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .legal-section h2 i {
+        color: #00f0ff;
+        font-size: 1.2rem;
+    }
+    .legal-section p {
+        color: #ccd;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        margin-bottom: 10px;
+    }
+    .legal-section ul {
+        color: #ccd;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }
+    .legal-section ul li {
+        margin-bottom: 4px;
+    }
+    .legal-section .highlight-box {
+        background: rgba(0, 240, 255, 0.03);
+        border-left: 3px solid #00f0ff;
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin: 10px 0;
+        color: #ccd;
+        font-size: 0.9rem;
+    }
+    .legal-section .highlight-box.warning {
+        border-left-color: #ff9800;
+        background: rgba(255, 152, 0, 0.03);
+    }
+    .legal-section .highlight-box.danger {
+        border-left-color: #f44336;
+        background: rgba(244, 67, 54, 0.03);
+    }
+    .legal-section .highlight-box.success {
+        border-left-color: #4caf50;
+        background: rgba(76, 175, 80, 0.03);
+    }
+    .legal-footer {
+        text-align: center;
+        padding: 20px 0;
+        color: #667;
+        font-size: 0.8rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 20px;
+    }
+    .legal-footer a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .legal-footer a:hover {
+        text-decoration: underline;
+    }
+    @media (max-width: 576px) {
+        .legal-section {
+            padding: 16px;
+        }
+        .legal-section h2 {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-container">
+    <!-- Header -->
+    <div class="legal-header">
+        <h1><i class="fas fa-scale-balanced"></i> Legal Policy</h1>
+        <div class="last-updated">Last Updated: January 15, 2024</div>
+        <p style="color: #8899aa; font-size: 0.9rem; margin-top: 8px;">
+            Legal and ethical guidelines for using WebShield Scanner.
+        </p>
+    </div>
+
+    <!-- Purpose -->
+    <div class="legal-section">
+        <h2><i class="fas fa-bullseye"></i> Purpose</h2>
+        <p>
+            This document defines the legal and ethical policies for WebShield Scanner. 
+            The app is designed for <strong>educational and authorized security testing purposes only</strong>.
+        </p>
+        <div class="highlight-box danger">
+            <i class="fas fa-exclamation-circle" style="color: #f44336;"></i>
+            <strong>Legal Warning:</strong> Unauthorized scanning is illegal and punishable by law. 
+            You are responsible for ensuring you have proper authorization before using this tool.
+        </div>
+    </div>
+
+    <!-- Ethical Guidelines -->
+    <div class="legal-section">
+        <h2><i class="fas fa-handshake"></i> Ethical Guidelines</h2>
+        
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 8px;">1. Authorization Confirmation</h4>
+        <p>Before every scan, users must confirm:</p>
+        <ul>
+            <li>They own the website <strong>OR</strong></li>
+            <li>They have written permission from the owner</li>
+        </ul>
+
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 12px;">2. Responsible Disclosure</h4>
+        <p>If you discover vulnerabilities:</p>
+        <ul>
+            <li>Notify the website owner immediately</li>
+            <li>Allow reasonable time for fixes</li>
+            <li>Do not disclose publicly without permission</li>
+        </ul>
+
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 12px;">3. Professional Conduct</h4>
+        <ul>
+            <li>Respect website owners and their terms of service</li>
+            <li>Use findings responsibly and ethically</li>
+            <li>Report issues through proper channels</li>
+            <li>Protect sensitive information discovered during scanning</li>
+        </ul>
+
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 12px;">4. Data Protection</h4>
+        <ul>
+            <li>Protect scan results from unauthorized access</li>
+            <li>Do not share sensitive findings without permission</li>
+            <li>Delete data when no longer needed</li>
+            <li>Comply with data protection laws (GDPR, CCPA, etc.)</li>
+        </ul>
+
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 12px;">5. Educational Purpose</h4>
+        <ul>
+            <li>Use for learning and education</li>
+            <li>Improve security awareness</li>
+            <li>Develop secure coding skills</li>
+            <li>Share knowledge responsibly</li>
+        </ul>
+    </div>
+
+    <!-- Compliance -->
+    <div class="legal-section">
+        <h2><i class="fas fa-gavel"></i> Compliance</h2>
+        
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 8px;">1. Legal Compliance</h4>
+        <p>Users must comply with applicable laws:</p>
+        <ul>
+            <li>Computer Fraud and Abuse Act (CFAA)</li>
+            <li>General Data Protection Regulation (GDPR)</li>
+            <li>California Consumer Privacy Act (CCPA)</li>
+            <li>Local cybersecurity laws and regulations</li>
+        </ul>
+
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 12px;">2. Jurisdiction</h4>
+        <p>WebShield Scanner is governed by:</p>
+        <ul>
+            <li>United States law</li>
+            <li>International cybersecurity standards</li>
+            <li>OWASP guidelines and best practices</li>
+        </ul>
+
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 12px;">3. Acceptable Use Policy</h4>
+        <p><strong>Acceptable uses:</strong></p>
+        <ul>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Security assessments</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Education and training</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Compliance testing</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Development and QA</li>
+        </ul>
+        <p><strong>Unacceptable uses:</strong></p>
+        <ul>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Unauthorized attacks</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Data theft</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Service disruption</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Malicious activities</li>
+        </ul>
+    </div>
+
+    <!-- Prohibited Activities -->
+    <div class="legal-section">
+        <h2><i class="fas fa-ban"></i> Prohibited Activities</h2>
+        <p>You are strictly prohibited from using WebShield Scanner for:</p>
+        <ul>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Scanning websites without authorization</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Attacking, damaging, or disrupting services</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Performing illegal activities</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Harvesting data without permission</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Bypassing security measures</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Performing denial-of-service attacks</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Distributing or sharing results without permission</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Using the app for any malicious purpose</li>
+        </ul>
+        <div class="highlight-box danger">
+            <i class="fas fa-exclamation-circle" style="color: #f44336;"></i>
+            <strong>Violation of these prohibitions may result in:</strong> Account termination, legal action, and criminal prosecution.
+        </div>
+    </div>
+
+    <!-- Authorization Confirmation -->
+    <div class="legal-section">
+        <h2><i class="fas fa-file-signature"></i> Authorization Confirmation</h2>
+        <p>
+            Before every scan, users must explicitly confirm they have authorization.
+            This confirmation is legally binding and may be used as evidence of consent.
+        </p>
+        <div class="highlight-box warning">
+            <i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i>
+            <strong>By confirming authorization, you acknowledge that:</strong>
+            <ul style="margin-top: 8px;">
+                <li>You have the legal right to scan the target</li>
+                <li>You accept full responsibility for your actions</li>
+                <li>You understand the legal implications of unauthorized scanning</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="legal-section">
+        <h2><i class="fas fa-triangle-exclamation"></i> Disclaimer of Liability</h2>
+        <p>
+            WebShield Scanner is provided "as is" without warranties. The developers and contributors are not liable for:
+        </p>
+        <ul>
+            <li><strong>Misuse</strong> of the app</li>
+            <li><strong>Unauthorized scanning</strong> by users</li>
+            <li><strong>Data loss</strong> or corruption</li>
+            <li><strong>Legal consequences</strong> of misuse</li>
+            <li><strong>Damages resulting</strong> from use of the app</li>
+            <li><strong>Business interruption</strong> or loss of revenue</li>
+        </ul>
+        <div class="highlight-box danger">
+            <i class="fas fa-exclamation-circle" style="color: #f44336;"></i>
+            <strong>Use at your own risk.</strong> You are solely responsible for ensuring compliance with all applicable laws and regulations.
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="legal-section">
+        <h2><i class="fas fa-envelope"></i> Contact</h2>
+        <p>For legal inquiries, please contact:</p>
+        <div class="contact-info" style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #8899aa; font-size: 0.85rem;">
+                <i class="fas fa-envelope" style="color: #00f0ff; width: 18px;"></i>
+                <span>Email: <a href="mailto:legal@webshield-scanner.com" style="color: #00f0ff;">legal@webshield-scanner.com</a></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; color: #8899aa; font-size: 0.85rem;">
+                <i class="fas fa-shield-halved" style="color: #00f0ff; width: 18px;"></i>
+                <span>Privacy: <a href="mailto:privacy@webshield-scanner.com" style="color: #00f0ff;">privacy@webshield-scanner.com</a></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; color: #8899aa; font-size: 0.85rem;">
+                <i class="fas fa-gavel" style="color: #00f0ff; width: 18px;"></i>
+                <span>DMCA: <a href="mailto:dmca@webshield-scanner.com" style="color: #00f0ff;">dmca@webshield-scanner.com</a></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acknowledgment -->
+    <div class="legal-section">
+        <h2><i class="fas fa-check-double"></i> Acknowledgment</h2>
+        <p>
+            By using WebShield Scanner, you acknowledge that you have read, understood, and agree to these legal policies.
+        </p>
+        <div class="highlight-box success">
+            <i class="fas fa-check-circle" style="color: #4caf50;"></i>
+            <strong>I acknowledge that:</strong>
+            <ul style="margin-top: 8px;">
+                <li>I have read and understood these policies</li>
+                <li>I agree to comply with all terms</li>
+                <li>I understand the legal implications of my actions</li>
+                <li>I accept full responsibility for my use of the app</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="legal-footer">
+        <p>
+            <i class="fas fa-shield-halved" style="color: #00f0ff;"></i>
+            WebShield Scanner - Ethical Security Testing
+        </p>
+        <p>
+            <a href="{{ url_for('page.privacy_policy') }}">Privacy Policy</a> &middot;
+            <a href="{{ url_for('page.terms_of_service') }}">Terms of Service</a> &middot;
+            <a href="{{ url_for('page.contact') }}">Contact Us</a>
+        </p>
+        <p style="margin-top: 4px;">
+            &copy; 2024 WebShield Scanner. All rights reserved.
+        </p>
+    </div>
+</div>
+{% endblock %}

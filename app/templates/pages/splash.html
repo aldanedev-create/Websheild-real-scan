@@ -1,0 +1,204 @@
+{% extends "auth_base.html" %}
+
+{% block title %}WebShield Scanner - Welcome{% endblock %}
+
+{% block extra_css %}
+<style>
+    .splash-content {
+        text-align: center;
+        padding: 20px 0;
+    }
+    .splash-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #00f0ff;
+        text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        margin-bottom: 10px;
+    }
+    .splash-subtitle {
+        font-size: 1.1rem;
+        color: #8899aa;
+        margin-bottom: 30px;
+    }
+    .splash-features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 30px 0;
+        text-align: left;
+    }
+    .splash-feature {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 240, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    .splash-feature:hover {
+        background: rgba(0, 240, 255, 0.1);
+        border-color: #00f0ff;
+        transform: translateY(-2px);
+    }
+    .splash-feature i {
+        color: #00f0ff;
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    .splash-feature h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+    .splash-feature p {
+        font-size: 0.75rem;
+        color: #8899aa;
+        margin: 0;
+    }
+    .splash-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    .splash-buttons .btn {
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    .btn-primary-glow {
+        background: linear-gradient(135deg, #00f0ff, #0066ff);
+        border: none;
+        color: #fff;
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+    }
+    .btn-primary-glow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 50px rgba(0, 240, 255, 0.4);
+    }
+    .btn-outline-glow {
+        background: transparent;
+        border: 2px solid rgba(0, 240, 255, 0.3);
+        color: #00f0ff;
+    }
+    .btn-outline-glow:hover {
+        background: rgba(0, 240, 255, 0.1);
+        border-color: #00f0ff;
+    }
+    .splash-legal {
+        margin-top: 25px;
+        padding: 15px;
+        background: rgba(255, 0, 0, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 0, 0, 0.1);
+    }
+    .splash-legal p {
+        font-size: 0.7rem;
+        color: #8899aa;
+        margin: 0;
+    }
+    .splash-legal i {
+        color: #ff4444;
+        margin-right: 5px;
+    }
+    @media (max-width: 576px) {
+        .splash-features {
+            grid-template-columns: 1fr;
+        }
+        .splash-title {
+            font-size: 2rem;
+        }
+    }
+    @media (max-height: 720px) {
+        .splash-content {
+            padding: 8px 0;
+        }
+        .splash-title {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+        .splash-subtitle {
+            margin-bottom: 18px;
+        }
+        .splash-features {
+            gap: 10px;
+            margin: 18px 0;
+        }
+        .splash-feature {
+            padding: 12px;
+        }
+        .splash-buttons .btn {
+            padding: 12px;
+        }
+        .splash-legal {
+            margin-top: 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="splash-content">
+    <div class="splash-title">WebShield</div>
+    <div class="splash-subtitle">Advanced Web Security Scanner</div>
+    
+    <div class="splash-features">
+        <div class="splash-feature">
+            <i class="fas fa-shield-halved"></i>
+            <h4>Security Scanning</h4>
+            <p>Detect vulnerabilities &amp; misconfigurations</p>
+        </div>
+        <div class="splash-feature">
+            <i class="fas fa-map"></i>
+            <h4>Attack Surface Mapping</h4>
+            <p>Discover exposed endpoints &amp; assets</p>
+        </div>
+        <div class="splash-feature">
+            <i class="fas fa-graduation-cap"></i>
+            <h4>Learning Center</h4>
+            <p>Learn OWASP Top 10 &amp; secure coding</p>
+        </div>
+        <div class="splash-feature">
+            <i class="fas fa-file-pdf"></i>
+            <h4>Professional Reports</h4>
+            <p>Export HTML, PDF &amp; JSON reports</p>
+        </div>
+    </div>
+    
+    <div class="splash-buttons">
+        <a href="{{ url_for('page.login') }}" class="btn btn-primary-glow">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+        <a href="{{ url_for('page.register') }}" class="btn btn-outline-glow">
+            <i class="fas fa-user-plus"></i> Create Account
+        </a>
+    </div>
+    
+    <div class="splash-legal">
+        <p>
+            <i class="fas fa-triangle-exclamation"></i>
+            <strong>Authorized Testing Only.</strong> Only scan websites you own or have written permission to test.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize Three.js cyber grid background
+    document.addEventListener('DOMContentLoaded', function() {
+        if (new URLSearchParams(window.location.search).get('logged_out') === '1') {
+            if (window.api) {
+                window.api.clearTokens(false);
+            }
+        }
+
+        if (typeof initCyberGrid === 'function') {
+            initCyberGrid('three-container');
+        }
+    });
+</script>
+{% endblock %}

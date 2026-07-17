@@ -1,0 +1,205 @@
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand" href="{{ url_for('page.dashboard') }}">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WebShield" height="32" class="d-inline-block align-text-top">
+            <span class="brand-text">WebShield</span>
+        </a>
+        
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
+                aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'page.dashboard' %}active{% endif %}" 
+                       href="{{ url_for('page.dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'page.new_scan' %}active{% endif %}" 
+                       href="{{ url_for('page.new_scan') }}">
+                        <i class="fas fa-plus-circle"></i> New Scan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'page.scan_history' %}active{% endif %}"
+                       href="{{ url_for('page.scan_history') }}">
+                        <i class="fas fa-clock-rotate-left"></i> History
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'page.learning_center' %}active{% endif %}" 
+                       href="{{ url_for('page.learning_center') }}">
+                        <i class="fas fa-graduation-cap"></i> Learn
+                    </a>
+                </li>
+                {% if current_user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'page.admin_dashboard' %}active{% endif %}"
+                       href="{{ url_for('page.admin_dashboard') }}">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <!-- Right Side -->
+            <ul class="navbar-nav ms-auto">
+                <!-- User Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" 
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-avatar-nav">
+                            {% if current_user.avatar_url %}
+                                <img src="{{ current_user.avatar_url }}" alt="{{ current_user.username }}" class="avatar-img">
+                            {% else %}
+                                <i class="fas fa-user-circle fa-lg"></i>
+                            {% endif %}
+                        </div>
+                        <span class="ms-1 d-none d-md-inline">{{ current_user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('page.settings') }}">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('page.dashboard') }}">
+                                <i class="fas fa-chart-bar"></i> Dashboard
+                            </a>
+                        </li>
+                        {% if current_user.is_admin %}
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('page.admin_dashboard') }}">
+                                <i class="fas fa-user-shield"></i> Admin
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="{{ url_for('page.logout') }}" onclick="if (window.api) window.api.clearTokens(false);">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+    .navbar {
+        background: rgba(10, 10, 26, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 8px 16px;
+        min-height: 56px;
+        z-index: 1050;
+    }
+    .navbar-brand {
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        color: #00f0ff !important;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+    }
+    .navbar-brand .brand-text {
+        margin-left: 8px;
+    }
+    .nav-link {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .nav-link:hover {
+        color: #fff !important;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .nav-link.active {
+        color: #00f0ff !important;
+        background: rgba(0, 240, 255, 0.08);
+    }
+    .nav-link i {
+        margin-right: 6px;
+        width: 18px;
+        text-align: center;
+    }
+    .premium-badge-nav {
+        color: #ffd700 !important;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    .premium-badge-nav i {
+        margin-right: 4px;
+    }
+    .user-avatar-nav {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        color: #00f0ff;
+        font-size: 1.2rem;
+    }
+    .user-avatar-nav .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .dropdown-menu {
+        background: rgba(20, 20, 40, 0.98);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 8px 0;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    .dropdown-item {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 8px 20px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    .dropdown-item:hover {
+        background: rgba(0, 240, 255, 0.08);
+        color: #00f0ff;
+    }
+    .dropdown-item i {
+        margin-right: 10px;
+        width: 18px;
+        text-align: center;
+    }
+    .dropdown-divider {
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+    .badge-upgrade {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ffd700, #f57c00);
+        color: #fff;
+        margin-left: 4px;
+    }
+    @media (max-width: 992px) {
+        .navbar {
+            padding: 6px 12px;
+        }
+        .nav-link {
+            padding: 10px 12px;
+        }
+    }
+</style>

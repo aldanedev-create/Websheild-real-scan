@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+        border: 1px solid rgba(0, 240, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        background: rgba(0, 240, 255, 0.05);
+        border-color: rgba(0, 240, 255, 0.3);
+        transform: translateY(-2px);
+    }
+    .stat-number {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #00f0ff;
+    }
+    .stat-label {
+        font-size: 0.75rem;
+        color: #8899aa;
+        margin-top: 4px;
+    }
+    .stat-score {
+        color: #4caf50;
+    }
+    .stat-score-warning {
+        color: #ff9800;
+    }
+    .stat-score-danger {
+        color: #f44336;
+    }
+    .quick-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+    .quick-action-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(0, 240, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .quick-action-btn:hover {
+        background: rgba(0, 240, 255, 0.1);
+        border-color: #00f0ff;
+        color: #00f0ff;
+        transform: translateY(-2px);
+    }
+    .quick-action-btn i {
+        font-size: 1.5rem;
+        display: block;
+        margin-bottom: 5px;
+        color: #00f0ff;
+    }
+    .quick-action-btn span {
+        font-size: 0.8rem;
+    }
+    .recent-scans {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .recent-scans h3 {
+        font-size: 1rem;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+    .scan-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .scan-item:last-child {
+        border-bottom: none;
+    }
+    .scan-info {
+        flex: 1;
+    }
+    .scan-url {
+        font-size: 0.85rem;
+        color: #fff;
+        font-weight: 500;
+    }
+    .scan-date {
+        font-size: 0.7rem;
+        color: #8899aa;
+    }
+    .scan-score {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .score-high {
+        color: #4caf50;
+    }
+    .score-medium {
+        color: #ff9800;
+    }
+    .score-low {
+        color: #f44336;
+    }
+    .no-scans {
+        text-align: center;
+        padding: 30px 0;
+        color: #8899aa;
+    }
+    .no-scans i {
+        font-size: 3rem;
+        color: #334;
+        margin-bottom: 10px;
+    }
+    .premium-banner {
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(0, 102, 255, 0.1));
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 12px;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .premium-banner-text {
+        color: #00f0ff;
+        font-size: 0.9rem;
+    }
+    .premium-banner-text i {
+        margin-right: 8px;
+    }
+    .btn-premium-sm {
+        background: linear-gradient(135deg, #00f0ff, #0066ff);
+        border: none;
+        color: #fff;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .btn-premium-sm:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="page-title">Dashboard</h2>
+    </div>
+    
+    <!-- Stats -->
+    <div class="dashboard-stats" id="stats-container">
+        <div class="stat-card">
+            <div class="stat-number" id="stat-scans">0</div>
+            <div class="stat-label">Total Scans</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number stat-score" id="stat-score">0</div>
+            <div class="stat-label">Avg Security Score</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="stat-findings">0</div>
+            <div class="stat-label">Total Findings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="stat-remaining">{{ current_user.get_remaining_scans() if current_user.get_remaining_scans() is not none else 'Unlimited' }}</div>
+            <div class="stat-label">Scans Remaining Today</div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{{ url_for('page.new_scan') }}" class="quick-action-btn">
+            <i class="fas fa-plus-circle"></i>
+            <span>New Scan</span>
+        </a>
+        <a href="{{ url_for('page.learning_center') }}" class="quick-action-btn">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Learn</span>
+        </a>
+        <a href="{{ url_for('page.scan_history') }}" class="quick-action-btn">
+            <i class="fas fa-clock-rotate-left"></i>
+            <span>History</span>
+        </a>
+        <a href="{{ url_for('page.settings') }}" class="quick-action-btn">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+    
+    <!-- Recent Scans -->
+    <div class="recent-scans">
+        <h3><i class="fas fa-clock"></i> Recent Scans</h3>
+        <div id="recent-scans-list">
+            <div class="no-scans">
+                <i class="fas fa-search"></i>
+                <p>No scans yet. Start your first scan!</p>
+                <a href="{{ url_for('page.new_scan') }}" class="btn btn-primary btn-sm mt-2">Start Scanning</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load dashboard data
+        loadDashboardStats();
+        loadRecentScans();
+    });
+</script>
+{% endblock %}

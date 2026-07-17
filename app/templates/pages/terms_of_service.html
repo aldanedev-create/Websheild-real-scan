@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .terms-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    .terms-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .terms-header h1 {
+        font-family: 'Orbitron', monospace;
+        color: #00f0ff;
+        font-size: 1.8rem;
+    }
+    .terms-header .last-updated {
+        color: #8899aa;
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+    .terms-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .terms-section h2 {
+        color: #00f0ff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .terms-section h2 i {
+        color: #00f0ff;
+        font-size: 1.2rem;
+    }
+    .terms-section p {
+        color: #ccd;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        margin-bottom: 10px;
+    }
+    .terms-section ul {
+        color: #ccd;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }
+    .terms-section ul li {
+        margin-bottom: 4px;
+    }
+    .terms-section .highlight-box {
+        background: rgba(0, 240, 255, 0.03);
+        border-left: 3px solid #00f0ff;
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin: 10px 0;
+        color: #ccd;
+        font-size: 0.9rem;
+    }
+    .terms-section .highlight-box.warning {
+        border-left-color: #ff9800;
+        background: rgba(255, 152, 0, 0.03);
+    }
+    .terms-section .highlight-box.danger {
+        border-left-color: #f44336;
+        background: rgba(244, 67, 54, 0.03);
+    }
+    .terms-section .highlight-box.success {
+        border-left-color: #4caf50;
+        background: rgba(76, 175, 80, 0.03);
+    }
+    .terms-footer {
+        text-align: center;
+        padding: 20px 0;
+        color: #667;
+        font-size: 0.8rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 20px;
+    }
+    .terms-footer a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .terms-footer a:hover {
+        text-decoration: underline;
+    }
+    @media (max-width: 576px) {
+        .terms-section {
+            padding: 16px;
+        }
+        .terms-section h2 {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="terms-container">
+    <!-- Header -->
+    <div class="terms-header">
+        <h1><i class="fas fa-gavel"></i> Terms of Service</h1>
+        <div class="last-updated">Last Updated: January 15, 2024</div>
+        <p style="color: #8899aa; font-size: 0.9rem; margin-top: 8px;">
+            Please read these terms carefully before using WebShield Scanner.
+        </p>
+    </div>
+
+    <!-- Section 1: Acceptance -->
+    <div class="terms-section">
+        <h2><i class="fas fa-check-circle"></i> 1. Acceptance of Terms</h2>
+        <p>
+            By using WebShield Scanner, you agree to these Terms of Service. 
+            If you do not agree, please do not use the app.
+        </p>
+        <div class="highlight-box warning">
+            <i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i>
+            <strong>By using this app, you accept these terms.</strong> If you disagree, you must stop using the service immediately.
+        </div>
+    </div>
+
+    <!-- Section 2: Authorized Use -->
+    <div class="terms-section">
+        <h2><i class="fas fa-user-check"></i> 2. Authorized Use Only</h2>
+        <p>WebShield Scanner is for <strong>authorized security testing only</strong>. You may only scan:</p>
+        <ul>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Websites you own</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Websites where you have explicit written permission</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Your own local development environments</li>
+        </ul>
+        <div class="highlight-box danger">
+            <i class="fas fa-exclamation-circle" style="color: #f44336;"></i>
+            <strong>Scanning without authorization is illegal.</strong> You are responsible for obtaining proper permission before using this tool.
+        </div>
+    </div>
+
+    <!-- Section 3: Prohibited Activities -->
+    <div class="terms-section">
+        <h2><i class="fas fa-ban"></i> 3. Prohibited Activities</h2>
+        <p>You may NOT use WebShield Scanner to:</p>
+        <ul>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Scan websites without authorization</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Attack, damage, or disrupt services</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Perform illegal activities</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Harvest data without permission</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Bypass security measures</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Perform denial-of-service attacks</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Distribute or share results without permission</li>
+        </ul>
+    </div>
+
+    <!-- Section 4: No Exploitation -->
+    <div class="terms-section">
+        <h2><i class="fas fa-shield-halved"></i> 4. No Exploitation</h2>
+        <p>
+            WebShield Scanner detects security indicators <strong>without exploitation</strong>. 
+            It does not perform any destructive or harmful actions.
+        </p>
+        <ul>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Does NOT execute SQL injection</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Does NOT execute XSS attacks</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Does NOT modify or delete data</li>
+            <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> Does NOT perform any destructive actions</li>
+        </ul>
+        <div class="highlight-box success">
+            <i class="fas fa-check-circle" style="color: #4caf50;"></i>
+            <strong>This is a passive scanning tool.</strong> It only analyzes publicly available information and reports potential issues.
+        </div>
+    </div>
+
+    <!-- Section 5: User Responsibility -->
+    <div class="terms-section">
+        <h2><i class="fas fa-user-shield"></i> 5. User Responsibility</h2>
+        <p>Users are solely responsible for:</p>
+        <ul>
+            <li><strong>Obtaining proper authorization</strong> before scanning</li>
+            <li><strong>Complying with all applicable laws</strong> and regulations</li>
+            <li><strong>Protecting scan results</strong> from unauthorized access</li>
+            <li><strong>Using findings responsibly</strong> and ethically</li>
+            <li><strong>Any consequences</strong> of unauthorized scanning</li>
+        </ul>
+        <div class="highlight-box warning">
+            <i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i>
+            <strong>You are responsible for your actions.</strong> The developers are not liable for misuse of this tool.
+        </div>
+    </div>
+
+    <!-- Section 6: Disclaimer -->
+    <div class="terms-section">
+        <h2><i class="fas fa-triangle-exclamation"></i> 6. Disclaimer of Liability</h2>
+        <p>
+            WebShield Scanner is provided "as is" without warranties. The developers are not liable for:
+        </p>
+        <ul>
+            <li><strong>Misuse</strong> of the app</li>
+            <li><strong>Unauthorized scanning</strong> by users</li>
+            <li><strong>Data loss</strong> or corruption</li>
+            <li><strong>Legal consequences</strong> of misuse</li>
+            <li><strong>Damages resulting</strong> from use of the app</li>
+        </ul>
+        <div class="highlight-box danger">
+            <i class="fas fa-exclamation-circle" style="color: #f44336;"></i>
+            <strong>Use at your own risk.</strong> You are responsible for ensuring compliance with all applicable laws.
+        </div>
+    </div>
+
+    <!-- Section 7: Account Termination -->
+    <div class="terms-section">
+        <h2><i class="fas fa-user-slash"></i> 7. Account Termination</h2>
+        <p>We reserve the right to terminate accounts that violate these terms:</p>
+        <ul>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Engaging in unauthorized scanning</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Misusing the app for illegal purposes</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Repeated violations of these terms</li>
+            <li><i class="fas fa-times-circle" style="color: #f44336;"></i> Any activity that harms the service or other users</li>
+        </ul>
+    </div>
+
+    <!-- Section 8: Intellectual Property -->
+    <div class="terms-section">
+        <h2><i class="fas fa-copyright"></i> 8. Intellectual Property</h2>
+        <p>
+            All content and code in WebShield Scanner, including logos, designs, and software, 
+            are the property of WebShield Scanner and protected by intellectual property laws.
+        </p>
+        <ul>
+            <li><strong>You may not:</strong> Copy, modify, or distribute the software without permission</li>
+            <li><strong>You may:</strong> Use the software for personal and educational purposes</li>
+        </ul>
+    </div>
+
+    <!-- Section 9: Changes -->
+    <div class="terms-section">
+        <h2><i class="fas fa-edit"></i> 9. Changes to These Terms</h2>
+        <p>
+            We may update these terms from time to time. We will notify you of changes by:
+        </p>
+        <ul>
+            <li>Posting the new terms on this page</li>
+            <li>Updating the "Last Updated" date</li>
+            <li>Sending an email notification (for significant changes)</li>
+        </ul>
+        <p style="margin-top: 8px;">Continued use of the app constitutes acceptance of the updated terms.</p>
+    </div>
+
+    <!-- Section 10: Contact -->
+    <div class="terms-section">
+        <h2><i class="fas fa-envelope"></i> 10. Contact Us</h2>
+        <p>
+            If you have questions about these Terms of Service, please contact us:
+        </p>
+        <div class="contact-info" style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #8899aa; font-size: 0.85rem;">
+                <i class="fas fa-envelope" style="color: #00f0ff; width: 18px;"></i>
+                <span>Email: <a href="mailto:support@webshield-scanner.com" style="color: #00f0ff;">support@webshield-scanner.com</a></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; color: #8899aa; font-size: 0.85rem;">
+                <i class="fas fa-shield-halved" style="color: #00f0ff; width: 18px;"></i>
+                <span>Legal: <a href="mailto:legal@webshield-scanner.com" style="color: #00f0ff;">legal@webshield-scanner.com</a></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="terms-footer">
+        <p>
+            <i class="fas fa-shield-halved" style="color: #00f0ff;"></i>
+            WebShield Scanner - Security for Everyone
+        </p>
+        <p>
+            <a href="{{ url_for('page.privacy_policy') }}">Privacy Policy</a> &middot;
+            <a href="{{ url_for('page.legal_policy') }}">Legal Policy</a> &middot;
+            <a href="{{ url_for('page.contact') }}">Contact Us</a>
+        </p>
+        <p style="margin-top: 4px;">
+            &copy; 2024 WebShield Scanner. All rights reserved.
+        </p>
+    </div>
+</div>
+{% endblock %}

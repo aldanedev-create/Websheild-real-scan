@@ -1,0 +1,270 @@
+<!-- Sidebar -->
+<aside class="sidebar d-none d-md-block" id="sidebar">
+    <div class="sidebar-inner">
+        <!-- User Profile -->
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
+                {% if current_user.avatar_url %}
+                    <img src="{{ current_user.avatar_url }}" alt="{{ current_user.username }}">
+                {% else %}
+                    <i class="fas fa-user-circle"></i>
+                {% endif %}
+            </div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-username">{{ current_user.username }}</div>
+                <div class="sidebar-user-plan">
+                    {% if current_user.is_premium() %}
+                        <span class="badge-premium"><i class="fas fa-crown"></i> Premium</span>
+                    {% else %}
+                        <span class="badge-free">Free</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <ul class="sidebar-menu">
+                <li class="sidebar-item {% if request.endpoint == 'page.dashboard' %}active{% endif %}">
+                    <a href="{{ url_for('page.dashboard') }}">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {% if request.endpoint == 'page.new_scan' %}active{% endif %}">
+                    <a href="{{ url_for('page.new_scan') }}">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>New Scan</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {% if request.endpoint == 'page.scan_history' %}active{% endif %}">
+                    <a href="{{ url_for('page.scan_history') }}">
+                        <i class="fas fa-clock-rotate-left"></i>
+                        <span>Scan History</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {% if request.endpoint == 'page.learning_center' %}active{% endif %}">
+                    <a href="{{ url_for('page.learning_center') }}">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Learning Center</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {% if request.endpoint == 'page.settings' %}active{% endif %}">
+                    <a href="{{ url_for('page.settings') }}">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {% if request.endpoint == 'page.contact' %}active{% endif %}">
+                    <a href="{{ url_for('page.contact') }}">
+                        <i class="fas fa-envelope"></i>
+                        <span>Contact</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- Scan Stats -->
+        <div class="sidebar-stats">
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-number">{{ current_user.total_scans or 0 }}</div>
+                <div class="sidebar-stat-label">Total Scans</div>
+            </div>
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-number">{{ current_user.get_remaining_scans() if current_user.is_authenticated else 0 }}</div>
+                <div class="sidebar-stat-label">Remaining Today</div>
+            </div>
+        </div>
+        
+        <!-- Logout -->
+        <div class="sidebar-footer">
+            <a href="{{ url_for('page.logout') }}" class="sidebar-logout" onclick="if (window.api) window.api.clearTokens(false);">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<style>
+    .sidebar {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        bottom: 0;
+        width: 240px;
+        background: rgba(10, 10, 26, 0.95);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        overflow-y: auto;
+        z-index: 1020;
+        padding: 16px 12px;
+    }
+    .sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(0, 240, 255, 0.2);
+        border-radius: 2px;
+    }
+    .sidebar-inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        margin-bottom: 16px;
+    }
+    .sidebar-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(0, 240, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #00f0ff;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .sidebar-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .sidebar-user-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .sidebar-username {
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .sidebar-user-plan {
+        font-size: 0.7rem;
+        margin-top: 2px;
+    }
+    .badge-premium {
+        background: linear-gradient(135deg, #ffd700, #f57c00);
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.6rem;
+    }
+    .badge-free {
+        background: rgba(255, 255, 255, 0.05);
+        color: #8899aa;
+        padding: 2px 10px;
+        border-radius: 10px;
+        font-size: 0.6rem;
+    }
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+    }
+    .sidebar-item {
+        margin-bottom: 2px;
+    }
+    .sidebar-item a {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+        gap: 10px;
+    }
+    .sidebar-item a i {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+    }
+    .sidebar-item a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .sidebar-item.active a {
+        color: #00f0ff;
+        background: rgba(0, 240, 255, 0.08);
+    }
+    .sidebar-item .badge-upgrade {
+        font-size: 0.55rem;
+        padding: 2px 8px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #ffd700, #f57c00);
+        color: #fff;
+        margin-left: auto;
+    }
+    .sidebar-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 12px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: auto;
+        margin-bottom: 12px;
+    }
+    .sidebar-stat {
+        text-align: center;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 8px;
+    }
+    .sidebar-stat-number {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #00f0ff;
+    }
+    .sidebar-stat-label {
+        font-size: 0.6rem;
+        color: #8899aa;
+        margin-top: 2px;
+    }
+    .sidebar-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 12px;
+    }
+    .sidebar-logout {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.4);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+    }
+    .sidebar-logout i {
+        width: 20px;
+        text-align: center;
+    }
+    .sidebar-logout:hover {
+        color: #f44336;
+        background: rgba(244, 67, 54, 0.05);
+    }
+    @media (max-width: 768px) {
+        .sidebar {
+            display: none !important;
+        }
+    }
+</style>

@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}Attack Surface Map - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .surface-container {
+        max-width: 100%;
+        padding: 20px 0;
+    }
+    .surface-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .surface-title-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+    }
+    .surface-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .surface-actions .btn {
+        border-radius: 8px;
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
+    .surface-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .surface-stat {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .surface-stat .num {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00f0ff;
+    }
+    .surface-stat .label {
+        font-size: 0.7rem;
+        color: #8899aa;
+    }
+    .surface-intel {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .intel-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .intel-panel h3,
+    .intel-panel h4 {
+        color: #00f0ff;
+        font-size: 0.95rem;
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .risk-meter {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .risk-score {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #00f0ff;
+        min-width: 92px;
+    }
+    .risk-text {
+        color: #ccd;
+        font-size: 0.85rem;
+        line-height: 1.45;
+    }
+    .risk-level {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .risk-level.critical,
+    .risk-level.high {
+        color: #ff8a80;
+        background: rgba(244, 67, 54, 0.08);
+    }
+    .risk-level.medium {
+        color: #ffd166;
+        background: rgba(255, 193, 7, 0.08);
+    }
+    .risk-level.low,
+    .risk-level.minimal {
+        color: #8df7a7;
+        background: rgba(76, 175, 80, 0.08);
+    }
+    .surface-card-list {
+        display: grid;
+        gap: 10px;
+    }
+    .analysis-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 10px;
+        color: #ccd;
+        font-size: 0.8rem;
+    }
+    .analysis-card .card-title {
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+    .analysis-card .meta {
+        color: #8899aa;
+        font-size: 0.74rem;
+        margin-top: 5px;
+    }
+    .severity-pill {
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .severity-pill.critical,
+    .severity-pill.high {
+        color: #ff8a80;
+        background: rgba(244, 67, 54, 0.1);
+    }
+    .severity-pill.medium {
+        color: #ffd166;
+        background: rgba(255, 193, 7, 0.1);
+    }
+    .severity-pill.low,
+    .severity-pill.minimal {
+        color: #8df7a7;
+        background: rgba(76, 175, 80, 0.1);
+    }
+    .surface-map-container {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 15px;
+        min-height: 400px;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+    }
+    #surface-map-canvas {
+        width: 100%;
+        height: 100%;
+        min-height: 400px;
+    }
+    .surface-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .surface-section {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .surface-section h4 {
+        font-size: 0.9rem;
+        color: #00f0ff;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .surface-section .item {
+        padding: 6px 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 6px;
+        margin: 4px 0;
+        font-size: 0.8rem;
+        color: #ccd;
+        word-break: break-all;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .surface-section .item .badge-count {
+        background: rgba(0, 240, 255, 0.1);
+        color: #00f0ff;
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+    }
+    .surface-section .item-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .surface-section .item-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    .surface-section .item-list::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .surface-section .item-list::-webkit-scrollbar-thumb {
+        background: rgba(0, 240, 255, 0.2);
+        border-radius: 2px;
+    }
+    .no-data {
+        color: #667;
+        text-align: center;
+        padding: 20px;
+        font-size: 0.85rem;
+    }
+    .technologies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .technologies .tech-tag {
+        background: rgba(0, 240, 255, 0.1);
+        color: #00f0ff;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        border: 1px solid rgba(0, 240, 255, 0.1);
+    }
+    @media (max-width: 768px) {
+        .surface-intel {
+            grid-template-columns: 1fr;
+        }
+        .surface-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="surface-container">
+    <div class="surface-header">
+        <div class="surface-title-wrap">
+            <h2 class="page-title"><i class="fas fa-sitemap"></i> Attack Surface Map</h2>
+            <span id="surface-url" class="text-muted" style="font-size:0.85rem;">Loading...</span>
+        </div>
+        <div class="surface-actions">
+            <a class="btn btn-outline-light btn-sm" href="{{ url_for('page.report_details', scan_id=scan_id) }}">
+                <i class="fas fa-file-lines"></i> Report
+            </a>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('page.scan_history') }}">
+                <i class="fas fa-clock-rotate-left"></i> History
+            </a>
+        </div>
+    </div>
+    
+    <div class="surface-stats" id="surface-stats">
+        <div class="surface-stat">
+            <div class="num" id="stat-pages">0</div>
+            <div class="label">Total Pages</div>
+        </div>
+        <div class="surface-stat">
+            <div class="num" id="stat-endpoints">0</div>
+            <div class="label">Endpoints</div>
+        </div>
+        <div class="surface-stat">
+            <div class="num" id="stat-forms">0</div>
+            <div class="label">Forms</div>
+        </div>
+        <div class="surface-stat">
+            <div class="num" id="stat-login">0</div>
+            <div class="label">Login Pages</div>
+        </div>
+        <div class="surface-stat">
+            <div class="num" id="stat-api">0</div>
+            <div class="label">API Endpoints</div>
+        </div>
+        <div class="surface-stat">
+            <div class="num" id="stat-admin">0</div>
+            <div class="label">Admin Pages</div>
+        </div>
+    </div>
+
+    <div class="surface-intel">
+        <div class="intel-panel">
+            <h3><i class="fas fa-crosshairs"></i> Pentest Exposure Summary</h3>
+            <div class="risk-meter">
+                <div class="risk-score"><span id="surface-risk-score">0</span>/100</div>
+                <div class="risk-text">
+                    <div><span class="risk-level minimal" id="surface-risk-level">unknown</span></div>
+                    <div id="surface-exposure-summary" style="margin-top:8px;">Waiting for attack surface analysis...</div>
+                </div>
+            </div>
+        </div>
+        <div class="intel-panel">
+            <h3><i class="fas fa-seedling"></i> Honeypot / WAF Signal</h3>
+            <div id="honeypot-summary" class="risk-text">Waiting for deception analysis...</div>
+        </div>
+    </div>
+    
+    <div class="surface-map-container">
+        <div id="surface-map-canvas"></div>
+    </div>
+    
+    <div class="surface-details" id="surface-details">
+        <div class="surface-section">
+            <h4><i class="fas fa-code"></i> Technologies Detected</h4>
+            <div class="technologies" id="tech-list">
+                <div class="no-data">No technologies detected</div>
+            </div>
+        </div>
+        
+        <div class="surface-section">
+            <h4><i class="fas fa-file"></i> File Types</h4>
+            <div id="file-types-list">
+                <div class="no-data">No files detected</div>
+            </div>
+        </div>
+        
+        <div class="surface-section">
+            <h4><i class="fas fa-link"></i> Directories</h4>
+            <div class="item-list" id="directories-list">
+                <div class="no-data">No directories detected</div>
+            </div>
+        </div>
+        
+        <div class="surface-section">
+            <h4><i class="fas fa-user-lock"></i> Login Pages</h4>
+            <div class="item-list" id="login-list">
+                <div class="no-data">No login pages detected</div>
+            </div>
+        </div>
+        
+        <div class="surface-section">
+            <h4><i class="fas fa-server"></i> API Endpoints</h4>
+            <div class="item-list" id="api-list">
+                <div class="no-data">No API endpoints detected</div>
+            </div>
+        </div>
+        
+        <div class="surface-section">
+            <h4><i class="fas fa-user-shield"></i> Admin Pages</h4>
+            <div class="item-list" id="admin-list">
+                <div class="no-data">No admin pages detected</div>
+            </div>
+        </div>
+
+        <div class="surface-section">
+            <h4><i class="fas fa-layer-group"></i> OWASP Review Buckets</h4>
+            <div class="item-list surface-card-list" id="owasp-buckets-list">
+                <div class="no-data">No review buckets available</div>
+            </div>
+        </div>
+
+        <div class="surface-section">
+            <h4><i class="fas fa-route"></i> Likely Attack Paths</h4>
+            <div class="item-list surface-card-list" id="attack-paths-list">
+                <div class="no-data">No attack paths inferred</div>
+            </div>
+        </div>
+
+        <div class="surface-section">
+            <h4><i class="fas fa-database"></i> Sensitive Data Signals</h4>
+            <div class="item-list surface-card-list" id="sensitive-data-list">
+                <div class="no-data">No sensitive data signals inferred</div>
+            </div>
+        </div>
+
+        <div class="surface-section">
+            <h4><i class="fas fa-code-branch"></i> Trust Boundaries</h4>
+            <div class="item-list surface-card-list" id="trust-boundaries-list">
+                <div class="no-data">No trust boundaries inferred</div>
+            </div>
+        </div>
+
+        <div class="surface-section">
+            <h4><i class="fas fa-clipboard-check"></i> Review Priorities</h4>
+            <div class="item-list surface-card-list" id="review-priorities-list">
+                <div class="no-data">No priorities available</div>
+            </div>
+        </div>
+
+        <div class="surface-section">
+            <h4><i class="fas fa-door-open"></i> Entry / Exit Points</h4>
+            <div class="item-list surface-card-list" id="entry-exit-list">
+                <div class="no-data">No entry or exit points available</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="{{ url_for('static', filename='js/three/network-map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/attack-surface-map.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const scanId = {{ scan_id }};
+        loadAttackSurface(scanId);
+    });
+</script>
+{% endblock %}

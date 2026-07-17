@@ -1,0 +1,558 @@
+{% extends "base.html" %}
+
+{% block title %}Print Report - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Print Styles */
+    @media print {
+        body { background: #fff; }
+        .no-print { display: none !important; }
+        .main-content { padding: 0 !important; margin: 0 !important; }
+        .print-container { padding: 20px; }
+        .finding { page-break-inside: avoid; }
+        .header { background: #1a1a2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .score-section { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .severity-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .badge-critical { background: #f44336 !important; color: #fff !important; }
+        .badge-high { background: #ff6b6b !important; color: #fff !important; }
+        .badge-medium { background: #ff9800 !important; color: #fff !important; }
+        .badge-low { background: #4caf50 !important; color: #fff !important; }
+        .badge-info { background: #8899aa !important; color: #fff !important; }
+        .recommendation { background: #e8f4f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .stats-grid .stat { background: #f9f9f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .finding { border: 1px solid #ddd !important; }
+        .surface-grid .item { background: #f9f9f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .technologies .tech { background: #e8f4f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    
+    .print-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .print-header h2 {
+        font-family: 'Orbitron', monospace;
+        color: #00f0ff;
+        font-size: 1.3rem;
+        margin: 0;
+    }
+    .print-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .print-actions .btn {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    
+    /* Reuse PDF styles for print */
+    .header {
+        background: #1a1a2e;
+        color: #00f0ff;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    .header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+    .header .subtitle {
+        color: #8899aa;
+        font-size: 12px;
+    }
+    .header .url {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 8px;
+        word-break: break-all;
+        color: #fff;
+    }
+    .score-section {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .score-section .score {
+        font-size: 48px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+    }
+    .score-section .risk-level {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    .score-section .summary-text {
+        margin-top: 10px;
+        color: #8899aa;
+        font-size: 14px;
+    }
+    .score-good { color: #4caf50; }
+    .score-medium { color: #ff9800; }
+    .score-bad { color: #f44336; }
+    .risk-critical { color: #f44336; }
+    .risk-high { color: #ff6b6b; }
+    .risk-medium { color: #ff9800; }
+    .risk-low { color: #4caf50; }
+    
+    .section {
+        margin-bottom: 25px;
+    }
+    .section h2 {
+        border-bottom: 2px solid rgba(0, 240, 255, 0.2);
+        padding-bottom: 8px;
+        color: #fff;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    .section h3 {
+        font-size: 13px;
+        color: #ccd;
+        margin: 12px 0 8px 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .stats-grid .stat {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px;
+        border-radius: 6px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .stats-grid .stat .number {
+        font-size: 20px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        color: #00f0ff;
+    }
+    .stats-grid .stat .label {
+        font-size: 9px;
+        color: #667;
+        margin-top: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .stat-critical .number { color: #f44336; }
+    .stat-high .number { color: #ff6b6b; }
+    .stat-medium .number { color: #ff9800; }
+    .stat-low .number { color: #4caf50; }
+    .stat-info .number { color: #8899aa; }
+    
+    .finding {
+        margin: 12px 0;
+        padding: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .finding .severity-badge {
+        display: inline-block;
+        padding: 2px 12px;
+        border-radius: 12px;
+        font-size: 9px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .badge-critical { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+    .badge-high { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+    .badge-medium { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+    .badge-low { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+    .badge-info { background: rgba(136, 153, 170, 0.2); color: #8899aa; }
+    
+    .finding .title {
+        font-size: 13px;
+        font-weight: bold;
+        margin: 6px 0 4px 0;
+        color: #fff;
+    }
+    .finding .url {
+        font-size: 10px;
+        color: #667;
+        word-break: break-all;
+        margin-bottom: 6px;
+    }
+    .finding .description {
+        font-size: 12px;
+        color: #ccd;
+        margin: 6px 0;
+    }
+    .finding .recommendation {
+        background: rgba(0, 240, 255, 0.05);
+        padding: 10px;
+        border-left: 3px solid #00f0ff;
+        margin: 6px 0;
+        font-size: 12px;
+        border-radius: 0 4px 4px 0;
+        color: #ccd;
+    }
+    .finding .meta-tags {
+        font-size: 9px;
+        color: #667;
+        margin-top: 6px;
+    }
+    .finding .meta-tags span {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1px 10px;
+        border-radius: 10px;
+        margin-right: 5px;
+    }
+    .finding-critical { border-left: 4px solid #f44336; }
+    .finding-high { border-left: 4px solid #ff6b6b; }
+    .finding-medium { border-left: 4px solid #ff9800; }
+    .finding-low { border-left: 4px solid #4caf50; }
+    .finding-info { border-left: 4px solid #8899aa; }
+    
+    .surface-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 10px 0;
+    }
+    .surface-grid .item {
+        background: rgba(255, 255, 255, 0.02);
+        padding: 10px 14px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .surface-grid .item .label {
+        font-size: 9px;
+        color: #667;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .surface-grid .item .value {
+        font-size: 14px;
+        font-weight: bold;
+        color: #00f0ff;
+        font-family: 'Orbitron', monospace;
+    }
+    
+    .technologies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .technologies .tech {
+        background: rgba(0, 240, 255, 0.1);
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 10px;
+        color: #00f0ff;
+        border: 1px solid rgba(0, 240, 255, 0.1);
+    }
+    .triage-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 12px 0;
+    }
+    .triage-card {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-left: 4px solid #8899aa;
+        border-radius: 6px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        page-break-inside: avoid;
+    }
+    .triage-card.critical { border-left-color: #f44336; }
+    .triage-card.high { border-left-color: #ff6b6b; }
+    .triage-card.medium { border-left-color: #ff9800; }
+    .triage-card.low { border-left-color: #4caf50; }
+    .triage-card .rank {
+        font-size: 9px;
+        color: #667;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .triage-card .title {
+        color: #fff;
+        font-weight: bold;
+        font-size: 12px;
+        margin: 4px 0;
+    }
+    .triage-card .meta {
+        color: #8899aa;
+        font-size: 10px;
+        word-break: break-word;
+    }
+    .triage-card .fix {
+        background: rgba(0, 240, 255, 0.05);
+        border-left: 3px solid #00f0ff;
+        border-radius: 0 4px 4px 0;
+        color: #ccd;
+        font-size: 10px;
+        margin-top: 8px;
+        padding: 8px;
+    }
+    .category-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        margin-top: 10px;
+    }
+    .category-table th,
+    .category-table td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 7px 6px;
+        text-align: left;
+    }
+    .category-table th {
+        color: #8899aa;
+        text-transform: uppercase;
+        font-size: 9px;
+        letter-spacing: 0.5px;
+    }
+    .affected-list {
+        margin: 8px 0 0 0;
+        padding-left: 16px;
+        color: #8899aa;
+        font-size: 10px;
+    }
+    .affected-list li {
+        word-break: break-all;
+        margin-bottom: 3px;
+    }
+    
+    .footer {
+        margin-top: 30px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 10px;
+        color: #667;
+        text-align: center;
+    }
+    .footer .legal {
+        margin-top: 5px;
+        color: #ff6b6b;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set report_triage = triage if triage is defined else {} %}
+{% set grouped_findings = report_triage.get('grouped_findings', []) %}
+{% set priority_findings = report_triage.get('priority_findings', []) %}
+{% set category_overview = report_triage.get('category_overview', []) %}
+<div class="print-container">
+    <div class="print-header no-print">
+        <h2><i class="fas fa-print"></i> Print Report</h2>
+        <div class="print-actions">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <a href="{{ url_for('report.export_pdf', scan_id=scan.id) }}" class="btn btn-success">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </a>
+            <a href="{{ url_for('page.report_details', scan_id=scan.id) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+    
+    <!-- Report Content -->
+    <div class="header">
+        <h1>WebShield Security Report</h1>
+        <div class="subtitle">Report ID: WS-{{ scan.id }}-{{ generated_at.strftime('%Y%m%d') }}</div>
+        <div class="subtitle">Generated: {{ generated_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC</div>
+        <div class="url">Target: {{ scan.target_url }}</div>
+    </div>
+    
+    <div class="score-section">
+        {% set display_score = scan.security_score if scan.security_score is not none else none %}
+        {% set score_class = 'unknown' %}
+        {% if display_score is not none and display_score >= 80 %}
+            {% set score_class = 'good' %}
+        {% elif display_score is not none and display_score >= 60 %}
+            {% set score_class = 'medium' %}
+        {% elif display_score is not none %}
+            {% set score_class = 'bad' %}
+        {% endif %}
+        <div class="score score-{{ score_class }}">
+            {{ display_score if display_score is not none else '--' }}/100
+        </div>
+        <div class="risk-level risk-{{ scan.risk_level }}">
+            Risk Level: {{ scan.risk_level.upper() if scan.risk_level else 'Unknown' }}
+        </div>
+        <div class="summary-text">{{ scan.summary or 'No summary available.' }}</div>
+    </div>
+    
+    <div class="section">
+        <h2>Executive Summary</h2>
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="number">{{ findings|length }}</div>
+                <div class="label">Total Findings</div>
+            </div>
+            <div class="stat stat-critical">
+                <div class="number">{{ scan.critical_findings or 0 }}</div>
+                <div class="label">Critical</div>
+            </div>
+            <div class="stat stat-high">
+                <div class="number">{{ scan.high_findings or 0 }}</div>
+                <div class="label">High</div>
+            </div>
+            <div class="stat stat-medium">
+                <div class="number">{{ scan.medium_findings or 0 }}</div>
+                <div class="label">Medium</div>
+            </div>
+            <div class="stat stat-low">
+                <div class="number">{{ scan.low_findings or 0 }}</div>
+                <div class="label">Low</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 10px; color: #8899aa; font-size: 12px;">
+            <p><strong>Pages Crawled:</strong> {{ scan.pages_crawled or 0 }}</p>
+            <p><strong>Scan Duration:</strong> {{ scan.get_duration() or 0 }} seconds</p>
+            <p><strong>Scan Started:</strong> {{ scan.started_at.strftime('%Y-%m-%d %H:%M:%S') if scan.started_at else 'N/A' }}</p>
+            <p><strong>Scan Completed:</strong> {{ scan.completed_at.strftime('%Y-%m-%d %H:%M:%S') if scan.completed_at else 'N/A' }}</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Priority Triage</h2>
+        {% if priority_findings %}
+        <div class="triage-grid">
+            {% for group in priority_findings[:8] %}
+            <div class="triage-card {{ group.severity }}">
+                <div class="rank">Priority {{ group.priority_rank }} - {{ group.category_label }}</div>
+                <div class="title">{{ group.title }}</div>
+                <div class="meta">
+                    {{ group.severity_label }} - {{ group.count }} finding{{ '' if group.count == 1 else 's' }}
+                    {% if group.first_seen_url %}<br>{{ group.first_seen_url }}{% endif %}
+                </div>
+                <div class="fix">{{ group.recommendation or 'Review the evidence and apply the recommended control.' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color:#8899aa;font-size:12px;">No high-priority findings were detected.</p>
+        {% endif %}
+
+        {% if category_overview %}
+        <h3>Category Overview</h3>
+        <table class="category-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Instances</th>
+                    <th>Groups</th>
+                    <th>Highest</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in category_overview %}
+                <tr>
+                    <td>{{ category.label }}</td>
+                    <td>{{ category.count }}</td>
+                    <td>{{ category.group_count }}</td>
+                    <td>{{ category.highest_severity.upper() }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    
+    {% if scan.attack_surface_data %}
+    <div class="section">
+        <h2>Attack Surface Overview</h2>
+        <div class="surface-grid">
+            <div class="item">
+                <div class="label">Total Pages</div>
+                <div class="value">{{ scan.attack_surface_data.total_pages or 0 }}</div>
+            </div>
+            <div class="item">
+                <div class="label">Endpoints</div>
+                <div class="value">{{ scan.attack_surface_data.endpoints|length or 0 }}</div>
+            </div>
+            <div class="item">
+                <div class="label">Login Pages</div>
+                <div class="value">{{ scan.attack_surface_data.login_pages|length or 0 }}</div>
+            </div>
+            <div class="item">
+                <div class="label">API Endpoints</div>
+                <div class="value">{{ scan.attack_surface_data.api_endpoints|length or 0 }}</div>
+            </div>
+        </div>
+        
+        {% if scan.attack_surface_data.technologies %}
+        <h3>Technologies Detected</h3>
+        <div class="technologies">
+            {% for tech in scan.attack_surface_data.technologies %}
+            <span class="tech">{{ tech }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="section">
+        <h2>Grouped Findings</h2>
+        
+        {% if grouped_findings %}
+            {% for group in grouped_findings %}
+            <div class="finding finding-{{ group.severity }}">
+                <div>
+                    <span class="severity-badge badge-{{ group.severity }}">{{ group.severity.upper() }}</span>
+                    <span style="font-size:9px;color:#667;margin-left:8px;">{{ group.category_label }} - {{ group.count }} finding{{ '' if group.count == 1 else 's' }}</span>
+                </div>
+                <div class="title">{{ group.title }}</div>
+                <div class="description"><strong>Description:</strong> {{ group.description or 'No description provided.' }}</div>
+                {% if group.evidence_samples %}
+                <div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:4px;font-family:monospace;font-size:10px;margin:6px 0;word-break:break-all;color:#8899aa;">
+                    <strong>Evidence:</strong> {{ group.evidence_samples[0] }}
+                </div>
+                {% endif %}
+                <div class="recommendation"><strong>Recommendation:</strong> {{ group.recommendation or 'No recommendation provided.' }}</div>
+                {% if group.affected_urls %}
+                <div class="meta-tags"><span>Affected URLs shown: {{ [group.affected_urls|length, 8]|min }} of {{ group.affected_urls|length }}</span></div>
+                <ul class="affected-list">
+                    {% for url in group.affected_urls[:8] %}
+                    <li>{{ url }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="meta-tags">
+                    {% if group.cwe_id %}<span>CWE-{{ group.cwe_id }}</span>{% endif %}
+                    {% if group.owasp_category %}<span>OWASP: {{ group.owasp_category }}</span>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center;color:#8899aa;padding:30px 0;font-size:1.1rem;">
+                <i class="fas fa-check-circle" style="color:#4caf50;font-size:2rem;display:block;margin-bottom:10px;"></i>
+                No security issues were found. The website appears to be well-configured.
+            </p>
+        {% endif %}
+    </div>
+    
+    <div class="footer">
+        <p>Generated by WebShield Scanner v{{ app_version or '1.0.0' }}</p>
+        <p>For educational and authorized security testing only.</p>
+        <div class="legal">Only scan websites you own or have written permission to test.</div>
+        <p style="margin-top:5px;">&copy; {{ generated_at.year }} WebShield Scanner. All rights reserved.</p>
+    </div>
+</div>
+{% endblock %}

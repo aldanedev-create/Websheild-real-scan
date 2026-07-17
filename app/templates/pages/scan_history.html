@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Scan History - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 18px 16px 90px;
+    }
+    .history-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+    .history-title {
+        margin: 0;
+        color: #fff;
+        font-size: 1.45rem;
+        font-weight: 700;
+    }
+    .history-toolbar {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) 170px 170px auto;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    .history-toolbar .form-control,
+    .history-toolbar .form-select {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border-radius: 8px;
+    }
+    .history-toolbar .form-control::placeholder {
+        color: #667;
+    }
+    .history-panel {
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.025);
+    }
+    .history-table {
+        width: 100%;
+        margin: 0;
+        color: #ccd;
+    }
+    .history-table th {
+        color: #8899aa;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.035);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 12px;
+    }
+    .history-table td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px;
+        vertical-align: middle;
+    }
+    .history-table tr:last-child td {
+        border-bottom: 0;
+    }
+    .target-url {
+        color: #fff;
+        font-weight: 600;
+        max-width: 360px;
+        overflow-wrap: anywhere;
+    }
+    .scan-meta {
+        color: #667;
+        font-size: 0.76rem;
+        margin-top: 2px;
+    }
+    .status-pill,
+    .risk-pill {
+        display: inline-flex;
+        align-items: center;
+        min-width: 82px;
+        justify-content: center;
+        padding: 4px 9px;
+        border-radius: 999px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-completed { color: #4caf50; background: rgba(76, 175, 80, 0.12); }
+    .status-running { color: #00f0ff; background: rgba(0, 240, 255, 0.12); }
+    .status-pending { color: #ff9800; background: rgba(255, 152, 0, 0.12); }
+    .status-failed { color: #f44336; background: rgba(244, 67, 54, 0.12); }
+    .status-cancelled { color: #8899aa; background: rgba(136, 153, 170, 0.12); }
+    .risk-critical,
+    .risk-high { color: #f44336; background: rgba(244, 67, 54, 0.12); }
+    .risk-medium { color: #ff9800; background: rgba(255, 152, 0, 0.12); }
+    .risk-low,
+    .risk-info { color: #4caf50; background: rgba(76, 175, 80, 0.12); }
+    .history-score {
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        color: #00f0ff;
+    }
+    .finding-counts {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+    .finding-counts span {
+        min-width: 24px;
+        text-align: center;
+        padding: 2px 6px;
+        border-radius: 6px;
+        font-size: 0.68rem;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .sev-critical { color: #f44336; }
+    .sev-high { color: #ff7043; }
+    .sev-medium { color: #ff9800; }
+    .sev-low { color: #4caf50; }
+    .history-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+    .history-actions .btn {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 8px;
+    }
+    .history-empty,
+    .history-loading {
+        padding: 42px 18px;
+        text-align: center;
+        color: #8899aa;
+    }
+    .history-empty i,
+    .history-loading i {
+        display: block;
+        color: #334;
+        font-size: 2.1rem;
+        margin-bottom: 10px;
+    }
+    .history-cards {
+        display: none;
+        gap: 10px;
+    }
+    .history-card {
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .history-card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+    .history-pager {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 14px;
+        color: #8899aa;
+        font-size: 0.85rem;
+    }
+    @media (max-width: 820px) {
+        .history-toolbar {
+            grid-template-columns: 1fr 1fr;
+        }
+        .history-toolbar .btn {
+            grid-column: span 2;
+        }
+        .history-table-wrap {
+            display: none;
+        }
+        .history-panel {
+            background: transparent;
+            border: 0;
+        }
+        .history-cards {
+            display: grid;
+        }
+    }
+    @media (max-width: 540px) {
+        .history-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+        .history-toolbar {
+            grid-template-columns: 1fr;
+        }
+        .history-toolbar .btn {
+            grid-column: auto;
+        }
+        .history-pager {
+            justify-content: space-between;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="history-page">
+    <div class="history-header">
+        <h1 class="history-title">Scan History</h1>
+        <a href="{{ url_for('page.new_scan') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> New Scan
+        </a>
+    </div>
+
+    <form class="history-toolbar" id="history-filter-form">
+        <input class="form-control" type="search" id="history-search" placeholder="Search target URL">
+        <select class="form-select" id="history-status" aria-label="Status">
+            <option value="all">All statuses</option>
+            <option value="completed">Completed</option>
+            <option value="running">Running</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="archived">Archived</option>
+        </select>
+        <select class="form-select" id="history-sort" aria-label="Sort">
+            <option value="created_at:desc">Newest first</option>
+            <option value="created_at:asc">Oldest first</option>
+            <option value="security_score:asc">Lowest score</option>
+            <option value="total_findings:desc">Most findings</option>
+            <option value="target_url:asc">Target A-Z</option>
+        </select>
+        <button class="btn btn-outline-info" type="submit">
+            <i class="fas fa-filter"></i> Apply
+        </button>
+    </form>
+
+    <div class="history-panel">
+        <div class="history-table-wrap">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Target</th>
+                        <th>Status</th>
+                        <th>Score</th>
+                        <th>Findings</th>
+                        <th>Risk</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table-body">
+                    <tr>
+                        <td colspan="6">
+                            <div class="history-loading"><i class="fas fa-spinner fa-spin"></i>Loading</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="history-cards" id="history-cards"></div>
+    </div>
+
+    <div class="history-pager">
+        <button class="btn btn-outline-light btn-sm" id="history-prev" type="button">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <span id="history-page-label">Page 1 of 1</span>
+        <button class="btn btn-outline-light btn-sm" id="history-next" type="button">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/scan-history.js') }}"></script>
+{% endblock %}

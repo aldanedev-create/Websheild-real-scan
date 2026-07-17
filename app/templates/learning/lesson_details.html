@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }} - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+<style>
+    .lesson-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    .lesson-back {
+        display: inline-block;
+        color: #8899aa;
+        text-decoration: none;
+        margin-bottom: 15px;
+        transition: color 0.3s ease;
+    }
+    .lesson-back:hover {
+        color: #00f0ff;
+    }
+    .lesson-header {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        margin-bottom: 25px;
+    }
+    .lesson-header .meta {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .lesson-header .meta .badge {
+        font-size: 0.7rem;
+        padding: 4px 14px;
+        border-radius: 12px;
+    }
+    .lesson-header .meta .badge-owasp {
+        background: rgba(0, 240, 255, 0.15);
+        color: #00f0ff;
+    }
+    .lesson-header .meta .badge-web_security {
+        background: rgba(76, 175, 80, 0.15);
+        color: #4caf50;
+    }
+    .lesson-header .meta .badge-secure_coding {
+        background: rgba(255, 152, 0, 0.15);
+        color: #ff9800;
+    }
+    .lesson-header .meta .badge-testing {
+        background: rgba(244, 67, 54, 0.15);
+        color: #f44336;
+    }
+    .lesson-header .meta .badge-api_security {
+        background: rgba(156, 39, 176, 0.15);
+        color: #ab47bc;
+    }
+    .lesson-header .meta .badge-premium {
+        background: rgba(255, 215, 0, 0.15);
+        color: #ffd700;
+    }
+    .lesson-header .meta .difficulty {
+        padding: 4px 14px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    .difficulty-beginner {
+        background: rgba(76, 175, 80, 0.15);
+        color: #4caf50;
+    }
+    .difficulty-intermediate {
+        background: rgba(255, 152, 0, 0.15);
+        color: #ff9800;
+    }
+    .difficulty-advanced {
+        background: rgba(244, 67, 54, 0.15);
+        color: #f44336;
+    }
+    .lesson-header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 10px 0;
+    }
+    .lesson-header .info {
+        display: flex;
+        gap: 20px;
+        font-size: 0.8rem;
+        color: #667;
+        margin-top: 8px;
+    }
+    .lesson-header .info i {
+        margin-right: 4px;
+    }
+    .lesson-content {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .lesson-content h2 {
+        color: #00f0ff;
+        font-size: 1.2rem;
+        margin-top: 25px;
+        margin-bottom: 10px;
+    }
+    .lesson-content h3 {
+        color: #ccd;
+        font-size: 1rem;
+        margin-top: 20px;
+        margin-bottom: 8px;
+    }
+    .lesson-content p {
+        color: #ccd;
+        line-height: 1.8;
+        margin-bottom: 12px;
+    }
+    .lesson-content ul {
+        color: #ccd;
+        padding-left: 20px;
+        margin-bottom: 12px;
+    }
+    .lesson-content ul li {
+        margin-bottom: 6px;
+    }
+    .lesson-content code {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: #00f0ff;
+    }
+    .lesson-content pre {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 15px 0;
+    }
+    .lesson-content pre code {
+        background: transparent;
+        padding: 0;
+        color: #ccd;
+        font-size: 0.8rem;
+    }
+    .lesson-content .highlight-box {
+        background: rgba(0, 240, 255, 0.05);
+        border-left: 4px solid #00f0ff;
+        padding: 15px 20px;
+        border-radius: 0 8px 8px 0;
+        margin: 15px 0;
+        color: #ccd;
+    }
+    .lesson-content .highlight-box.warning {
+        border-left-color: #ff9800;
+        background: rgba(255, 152, 0, 0.05);
+    }
+    .lesson-content .highlight-box.danger {
+        border-left-color: #f44336;
+        background: rgba(244, 67, 54, 0.05);
+    }
+    .lesson-content .highlight-box.success {
+        border-left-color: #4caf50;
+        background: rgba(76, 175, 80, 0.05);
+    }
+    .lesson-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+    .lesson-actions .btn {
+        padding: 10px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-like {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ccd;
+    }
+    .btn-like:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: #00f0ff;
+        color: #00f0ff;
+    }
+    .btn-like.liked {
+        background: rgba(0, 240, 255, 0.1);
+        border-color: #00f0ff;
+        color: #00f0ff;
+    }
+    .btn-back {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: #8899aa;
+    }
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+    }
+    .premium-locked {
+        text-align: center;
+        padding: 40px 20px;
+        background: rgba(255, 215, 0, 0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 215, 0, 0.1);
+    }
+    .premium-locked i {
+        font-size: 3rem;
+        color: #ffd700;
+        margin-bottom: 15px;
+    }
+    .premium-locked h3 {
+        color: #ffd700;
+    }
+    .premium-locked p {
+        color: #8899aa;
+        margin-bottom: 15px;
+    }
+    .premium-locked .btn-premium {
+        background: linear-gradient(135deg, #ffd700, #f57c00);
+        border: none;
+        color: #fff;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .premium-locked .btn-premium:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lesson-container">
+    <a href="{{ url_for('page.learning_center') }}" class="lesson-back">
+        <i class="fas fa-arrow-left"></i> Back to Learning Center
+    </a>
+    
+    {% if lesson %}
+        <!-- Lesson Content -->
+        <div class="lesson-header">
+            <div class="meta">
+                <span class="badge badge-{{ lesson.category }}">{{ lesson.category|replace('_', ' ')|title }}</span>
+                <span class="difficulty difficulty-{{ lesson.difficulty }}">{{ lesson.difficulty|capitalize }}</span>
+            </div>
+            <h1>{{ lesson.title }}</h1>
+            <div class="info">
+                <span><i class="fas fa-clock"></i> {{ lesson.reading_time }} min read</span>
+                <span><i class="fas fa-eye"></i> {{ lesson.views }} views</span>
+                <span><i class="fas fa-heart"></i> {{ lesson.likes }} likes</span>
+            </div>
+        </div>
+        
+        <div class="lesson-content">
+            {{ lesson_html|safe }}
+        </div>
+        
+        <div class="lesson-actions">
+            <button class="btn btn-like" id="like-btn" onclick="likeLesson({{ lesson.id }})">
+                <i class="fas fa-heart"></i> <span id="like-count">{{ lesson.likes }}</span>
+            </button>
+            <a href="{{ url_for('page.learning_center') }}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Lessons
+            </a>
+        </div>
+    {% else %}
+    <!-- Lesson Not Found -->
+    <div style="text-align:center;padding:60px 20px;color:#8899aa;">
+        <i class="fas fa-book-open" style="font-size:4rem;color:#334;margin-bottom:15px;"></i>
+        <h3 style="color:#fff;">Lesson Not Found</h3>
+        <p>The lesson you're looking for doesn't exist or has been removed.</p>
+        <a href="{{ url_for('page.learning_center') }}" class="btn btn-primary mt-3">Browse Lessons</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function likeLesson(lessonId) {
+        const btn = document.getElementById('like-btn');
+        const countSpan = document.getElementById('like-count');
+        if (!window.api || !window.api.isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+        
+        btn.disabled = true;
+
+        window.api.learning.likeLesson(lessonId)
+        .then(data => {
+            if (data.success) {
+                countSpan.textContent = data.likes;
+                btn.classList.toggle('liked');
+            }
+            btn.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            btn.disabled = false;
+        });
+    }
+</script>
+{% endblock %}

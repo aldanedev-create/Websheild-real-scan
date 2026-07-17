@@ -1,0 +1,320 @@
+{% extends "auth_base.html" %}
+
+{% block title %}Register - WebShield Scanner{% endblock %}
+
+{% block content %}
+<div class="auth-form-container">
+    <h3 class="auth-form-title">Create Account</h3>
+    <p class="auth-form-subtitle">Start securing your web applications today</p>
+    
+    <form id="register-form" method="POST" action="{{ url_for('auth.register') }}">
+        {{ form.hidden_tag() if form else '' }}
+        
+        <div class="form-group mb-3">
+            <label for="username" class="form-label">
+                <i class="fas fa-user"></i> Username
+            </label>
+            <input type="text" class="form-control" id="username" name="username" 
+                   placeholder="Choose a username" required autofocus>
+            <div class="form-text text-muted-small">3-30 characters, alphanumeric with underscores</div>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="email" class="form-label">
+                <i class="fas fa-envelope"></i> Email Address
+            </label>
+            <input type="email" class="form-control" id="email" name="email" 
+                   placeholder="Enter your email address" required>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="full_name" class="form-label">
+                <i class="fas fa-user-circle"></i> Full Name (Optional)
+            </label>
+            <input type="text" class="form-control" id="full_name" name="full_name" 
+                   placeholder="Enter your full name">
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="password" class="form-label">
+                <i class="fas fa-lock"></i> Password
+            </label>
+            <div class="password-input-wrapper">
+                <input type="password" class="form-control" id="password" name="password" 
+                       placeholder="Create a strong password" required>
+                <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="password-strength" id="password-strength">
+                <div class="strength-bar"></div>
+                <span class="strength-text">Password strength: <span id="strength-label">Weak</span></span>
+            </div>
+            <div class="form-text text-muted-small">
+                Minimum 8 characters with uppercase, lowercase, numbers, and a special character
+            </div>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="confirm_password" class="form-label">
+                <i class="fas fa-check-circle"></i> Confirm Password
+            </label>
+            <div class="password-input-wrapper">
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                       placeholder="Confirm your password" required>
+                <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div id="password-match" class="form-text"></div>
+        </div>
+        
+        <div class="form-group mb-3">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                <label class="form-check-label" for="terms">
+                    I agree to the <a href="{{ url_for('page.terms_of_service') }}" target="_blank">Terms of Service</a> 
+                    and <a href="{{ url_for('page.privacy_policy') }}" target="_blank">Privacy Policy</a>
+                </label>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-auth">
+            <i class="fas fa-user-plus"></i> Create Account
+        </button>
+    </form>
+    
+    <div class="auth-divider">
+        <span>or</span>
+    </div>
+    
+    <div class="auth-social">
+        <button class="btn btn-social btn-google">
+            <i class="fab fa-google"></i> Sign up with Google
+        </button>
+        <button class="btn btn-social btn-github">
+            <i class="fab fa-github"></i> Sign up with GitHub
+        </button>
+    </div>
+    
+    <div class="auth-footer-link">
+        Already have an account? <a href="{{ url_for('page.login') }}">Sign In</a>
+    </div>
+</div>
+
+<style>
+    .text-muted-small {
+        font-size: 0.7rem;
+        color: #667;
+        margin-top: 4px;
+    }
+    .password-input-wrapper {
+        position: relative;
+    }
+    .password-input-wrapper .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #667;
+        cursor: pointer;
+        padding: 5px;
+    }
+    .password-input-wrapper .password-toggle:hover {
+        color: #00f0ff;
+    }
+    .password-strength {
+        margin-top: 8px;
+    }
+    .password-strength .strength-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 4px;
+    }
+    .password-strength .strength-bar .fill {
+        height: 100%;
+        transition: width 0.3s ease;
+        border-radius: 4px;
+    }
+    .password-strength .strength-text {
+        font-size: 0.7rem;
+        color: #8899aa;
+    }
+    .password-strength .strength-text #strength-label {
+        font-weight: 600;
+    }
+    .btn-auth {
+        width: 100%;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #00f0ff, #0066ff);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+    }
+    .auth-divider {
+        text-align: center;
+        margin: 20px 0;
+        position: relative;
+    }
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .auth-divider span {
+        background: #0a0a1a;
+        padding: 0 15px;
+        color: #667;
+        font-size: 0.85rem;
+        position: relative;
+        z-index: 1;
+    }
+    .auth-social {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .btn-social {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.02);
+        color: #ccd;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .btn-social:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(0, 240, 255, 0.2);
+        color: #fff;
+    }
+    .btn-social i {
+        margin-right: 10px;
+    }
+    .btn-google i {
+        color: #ea4335;
+    }
+    .btn-github i {
+        color: #fff;
+    }
+    .auth-footer-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #8899aa;
+        font-size: 0.9rem;
+    }
+    .auth-footer-link a {
+        color: #00f0ff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .auth-footer-link a:hover {
+        text-decoration: underline;
+    }
+    .form-check-label a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .form-check-label a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<script>
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        const icon = input.parentElement.querySelector('.password-toggle i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+    
+    // Password strength checker
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const strength = checkPasswordStrength(password);
+        const bar = document.querySelector('.strength-bar');
+        const label = document.getElementById('strength-label');
+        
+        let color, width, text;
+        if (strength < 2) {
+            color = '#f44336';
+            width = '25%';
+            text = 'Weak';
+        } else if (strength < 4) {
+            color = '#ff9800';
+            width = '50%';
+            text = 'Fair';
+        } else if (strength < 6) {
+            color = '#ffc107';
+            width = '75%';
+            text = 'Good';
+        } else {
+            color = '#4caf50';
+            width = '100%';
+            text = 'Strong';
+        }
+        
+        // Update bar
+        if (!bar.querySelector('.fill')) {
+            const fill = document.createElement('div');
+            fill.className = 'fill';
+            bar.appendChild(fill);
+        }
+        const fill = bar.querySelector('.fill');
+        fill.style.width = width;
+        fill.style.background = color;
+        label.textContent = text;
+        label.style.color = color;
+    });
+    
+    function checkPasswordStrength(password) {
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^a-zA-Z0-9]/.test(password)) score++;
+        return score;
+    }
+    
+    // Password match check
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirm = this.value;
+        const matchDiv = document.getElementById('password-match');
+        
+        if (!confirm) {
+            matchDiv.textContent = '';
+            matchDiv.style.color = '';
+        } else if (password === confirm) {
+            matchDiv.textContent = '✓ Passwords match';
+            matchDiv.style.color = '#4caf50';
+        } else {
+            matchDiv.textContent = '✗ Passwords do not match';
+            matchDiv.style.color = '#f44336';
+        }
+    });
+</script>
+{% endblock %}

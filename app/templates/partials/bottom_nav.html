@@ -1,0 +1,97 @@
+<!-- Bottom Navigation (Mobile) -->
+<nav class="bottom-nav d-md-none">
+    <div class="bottom-nav-inner">
+        <a href="{{ url_for('page.dashboard') }}" class="bottom-nav-item {% if request.endpoint == 'page.dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('page.new_scan') }}" class="bottom-nav-item {% if request.endpoint == 'page.new_scan' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i>
+            <span>Scan</span>
+        </a>
+        <a href="{{ url_for('page.scan_history') }}" class="bottom-nav-item {% if request.endpoint == 'page.scan_history' %}active{% endif %}">
+            <i class="fas fa-clock-rotate-left"></i>
+            <span>History</span>
+        </a>
+        <a href="{{ url_for('page.learning_center') }}" class="bottom-nav-item {% if request.endpoint == 'page.learning_center' %}active{% endif %}">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Learn</span>
+        </a>
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('page.admin_dashboard') }}" class="bottom-nav-item {% if request.endpoint == 'page.admin_dashboard' %}active{% endif %}">
+            <i class="fas fa-user-shield"></i>
+            <span>Admin</span>
+        </a>
+        {% endif %}
+        <a href="{{ url_for('page.settings') }}" class="bottom-nav-item {% if request.endpoint == 'page.settings' %}active{% endif %}">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+</nav>
+
+<style>
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 26, 0.98);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        z-index: 1040;
+        padding: 4px 0 env(safe-area-inset-bottom);
+        height: 60px;
+    }
+    .bottom-nav-inner {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.4);
+        text-decoration: none;
+        padding: 4px 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 0.6rem;
+        min-width: 56px;
+    }
+    .bottom-nav-item i {
+        font-size: 1.3rem;
+        margin-bottom: 2px;
+        transition: all 0.3s ease;
+    }
+    .bottom-nav-item span {
+        font-size: 0.55rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+    .bottom-nav-item:hover {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .bottom-nav-item.active {
+        color: #00f0ff;
+    }
+    .bottom-nav-item.active i {
+        text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+    /* Add padding to main content for bottom nav */
+    .main-content {
+        padding-bottom: 70px !important;
+    }
+    @media (min-width: 768px) {
+        .bottom-nav {
+            display: none !important;
+        }
+        .main-content {
+            padding-bottom: 20px !important;
+        }
+    }
+</style>

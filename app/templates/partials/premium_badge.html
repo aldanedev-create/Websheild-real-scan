@@ -1,0 +1,58 @@
+<!-- Premium Badge Component -->
+{% macro premium_badge(show_icon=true, size='md') %}
+    <span class="premium-badge premium-badge-{{ size }}">
+        {% if show_icon %}
+            <i class="fas fa-crown"></i>
+        {% endif %}
+        Premium
+    </span>
+{% endmacro %}
+
+<!-- Usage: {{ premium_badge(show_icon=true, size='sm') }} -->
+
+<style>
+    .premium-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: linear-gradient(135deg, #ffd700, #f57c00);
+        color: #fff;
+        font-weight: 700;
+        border-radius: 20px;
+        font-family: 'Rajdhani', sans-serif;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+    }
+    .premium-badge i {
+        font-size: 0.8em;
+    }
+    .premium-badge-sm {
+        padding: 2px 10px;
+        font-size: 0.55rem;
+    }
+    .premium-badge-md {
+        padding: 4px 14px;
+        font-size: 0.7rem;
+    }
+    .premium-badge-lg {
+        padding: 6px 18px;
+        font-size: 0.85rem;
+    }
+    .premium-badge-xl {
+        padding: 8px 24px;
+        font-size: 1rem;
+        border-radius: 30px;
+    }
+    .premium-badge-glow {
+        animation: glowPulse 2s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+        }
+    }
+</style>

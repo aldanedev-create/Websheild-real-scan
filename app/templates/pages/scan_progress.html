@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Scan Progress - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .progress-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px 0;
+        text-align: center;
+    }
+    .scan-status-icon {
+        font-size: 4rem;
+        color: #00f0ff;
+        margin-bottom: 20px;
+    }
+    .scan-status-icon.running {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.1); }
+    }
+    .scan-status-text {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+    .scan-url-display {
+        color: #8899aa;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        word-break: break-all;
+    }
+    .progress-bar-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+        margin: 20px 0;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #00f0ff, #0066ff);
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+    .progress-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        margin: 20px 0;
+    }
+    .progress-stat {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .progress-stat .number {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #00f0ff;
+    }
+    .progress-stat .label {
+        font-size: 0.7rem;
+        color: #8899aa;
+    }
+    .scan-log {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        max-height: 200px;
+        overflow-y: auto;
+        text-align: left;
+        font-family: 'Courier New', monospace;
+        font-size: 0.75rem;
+        color: #8899aa;
+    }
+    .scan-log .log-entry {
+        padding: 3px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    .scan-log .log-entry .time {
+        color: #556;
+        margin-right: 8px;
+    }
+    .scan-log .log-entry .info {
+        color: #00f0ff;
+    }
+    .scan-log .log-entry .success {
+        color: #4caf50;
+    }
+    .scan-log .log-entry .warning {
+        color: #ff9800;
+    }
+    .scan-log .log-entry .error {
+        color: #f44336;
+    }
+    .btn-cancel-scan {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #8899aa;
+        padding: 10px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+    .btn-cancel-scan:hover {
+        background: rgba(255, 0, 0, 0.1);
+        border-color: #ff4444;
+        color: #ff4444;
+    }
+    .scan-complete {
+        display: none;
+    }
+    .scan-complete .btn-view-report {
+        background: linear-gradient(135deg, #00f0ff, #0066ff);
+        border: none;
+        color: #fff;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .scan-complete .btn-view-report:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        color: #fff;
+    }
+    .scan-complete .score-display {
+        font-family: 'Orbitron', monospace;
+        font-size: 3rem;
+        font-weight: 900;
+        margin: 15px 0;
+    }
+    .score-good {
+        color: #4caf50;
+    }
+    .score-medium {
+        color: #ff9800;
+    }
+    .score-bad {
+        color: #f44336;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="progress-container">
+    <div id="scan-status">
+        <div class="scan-status-icon running">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+        <div class="scan-status-text" id="status-text">Initializing Scan...</div>
+        <div class="scan-url-display" id="scan-url-display">https://example.com</div>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-stats">
+            <div class="progress-stat">
+                <div class="number" id="pages-crawled">0</div>
+                <div class="label">Pages Crawled</div>
+            </div>
+            <div class="progress-stat">
+                <div class="number" id="findings-found">0</div>
+                <div class="label">Findings Found</div>
+            </div>
+            <div class="progress-stat">
+                <div class="number" id="elapsed-time">00:00</div>
+                <div class="label">Elapsed Time</div>
+            </div>
+        </div>
+        
+        <div class="scan-log" id="scan-log">
+            <div class="log-entry">
+                <span class="time">[--:--:--]</span>
+                <span class="info">Initializing scan engine...</span>
+            </div>
+        </div>
+        
+        <button class="btn-cancel-scan" id="cancel-scan">
+            <i class="fas fa-times"></i> Cancel Scan
+        </button>
+    </div>
+    
+    <div class="scan-complete" id="scan-complete">
+        <div class="scan-status-icon">
+            <i class="fas fa-check-circle" style="color: #4caf50;"></i>
+        </div>
+        <div class="scan-status-text" style="color: #4caf50;">Scan Complete!</div>
+        <div class="score-display" id="final-score">--</div>
+        <div style="color: #8899aa; margin-bottom: 15px;" id="final-risk">Risk Level: --</div>
+        <div style="color: #8899aa; margin-bottom: 20px;" id="final-findings">Findings: 0</div>
+        <a href="#" class="btn-view-report" id="view-report-btn">
+            <i class="fas fa-file-alt"></i> View Report
+        </a>
+        <br>
+        <a href="{{ url_for('page.dashboard') }}" class="btn btn-outline-secondary mt-3" style="border-color: rgba(255,255,255,0.1); color: #8899aa;">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/scan-progress.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const scanId = {{ scan_id }};
+        initScanProgress(scanId);
+    });
+</script>
+{% endblock %}

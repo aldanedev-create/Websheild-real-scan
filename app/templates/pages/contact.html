@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    .contact-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .contact-header h1 {
+        font-family: 'Orbitron', monospace;
+        color: #00f0ff;
+        font-size: 1.8rem;
+    }
+    .contact-header p {
+        color: #8899aa;
+        font-size: 0.95rem;
+    }
+    .contact-form {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .contact-form .form-label {
+        color: #8899aa;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .contact-form .form-control {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+    .contact-form .form-control:focus {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #00f0ff;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.05);
+        color: #fff;
+    }
+    .contact-form .form-control::placeholder {
+        color: #556;
+    }
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #00f0ff, #0066ff);
+        border: none;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+    }
+    .btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .contact-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .contact-info-card {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    .contact-info-card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(0, 240, 255, 0.1);
+    }
+    .contact-info-card i {
+        font-size: 1.5rem;
+        color: #00f0ff;
+        margin-bottom: 8px;
+    }
+    .contact-info-card h4 {
+        font-size: 0.85rem;
+        color: #ccd;
+        margin-bottom: 4px;
+    }
+    .contact-info-card p {
+        font-size: 0.8rem;
+        color: #8899aa;
+        margin: 0;
+    }
+    .contact-info-card a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .contact-info-card a:hover {
+        text-decoration: underline;
+    }
+    @media (max-width: 576px) {
+        .contact-info-grid {
+            grid-template-columns: 1fr;
+        }
+        .contact-form {
+            padding: 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-container">
+    <div class="contact-header">
+        <h1><i class="fas fa-envelope"></i> Contact Us</h1>
+        <p>Have questions or feedback? We'd love to hear from you.</p>
+    </div>
+
+    <div class="contact-form">
+        <form method="POST" action="{{ url_for('page.contact') }}">
+            {{ form.hidden_tag() if form else '' }}
+            
+            <div class="form-group mb-3">
+                <label for="name" class="form-label"><i class="fas fa-user"></i> Your Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="email" class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="subject" class="form-label"><i class="fas fa-tag"></i> Subject</label>
+                <select class="form-control" id="subject" name="subject" required>
+                    <option value="">Select a subject...</option>
+                    <option value="general">General Inquiry</option>
+                    <option value="support">Technical Support</option>
+                    <option value="bug">Bug Report</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="security">Security Issue</option>
+                    <option value="legal">Legal Inquiry</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="message" class="form-label"><i class="fas fa-comment"></i> Message</label>
+                <textarea class="form-control" id="message" name="message" rows="5" placeholder="Describe your issue or question..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+        </form>
+    </div>
+
+    <div class="contact-info-grid">
+        <div class="contact-info-card">
+            <i class="fas fa-envelope"></i>
+            <h4>Email</h4>
+            <p><a href="mailto:support@webshield-scanner.com">aldanehutchinson5@gmail.com</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

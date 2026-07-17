@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a1a">
+    
+    <title>{% block title %}WebShield Scanner{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="auth-body">
+    <!-- Three.js Background -->
+    <div id="three-container"></div>
+    
+    <!-- Main Content -->
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <!-- Logo -->
+            <div class="auth-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="WebShield Scanner" class="logo-image">
+                <h1 class="logo-text">WebShield</h1>
+                <p class="logo-subtitle">Security Scanner</p>
+            </div>
+            
+            <!-- Flash Messages -->
+            {% include 'partials/flash_messages.html' %}
+            
+            <!-- Auth Content -->
+            <div class="auth-content">
+                {% block content %}{% endblock %}
+            </div>
+            
+            <!-- Footer -->
+            <div class="auth-footer">
+                <p>&copy; 2026 WebShield Scanner. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="{{ url_for('static', filename='js/three/cyber-grid.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

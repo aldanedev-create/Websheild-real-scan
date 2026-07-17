@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .privacy-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    .privacy-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .privacy-header h1 {
+        font-family: 'Orbitron', monospace;
+        color: #00f0ff;
+        font-size: 1.8rem;
+    }
+    .privacy-header .last-updated {
+        color: #8899aa;
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+    .privacy-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .privacy-section h2 {
+        color: #00f0ff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .privacy-section h2 i {
+        color: #00f0ff;
+        font-size: 1.2rem;
+    }
+    .privacy-section p {
+        color: #ccd;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        margin-bottom: 10px;
+    }
+    .privacy-section ul {
+        color: #ccd;
+        font-size: 0.9rem;
+        line-height: 1.8;
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }
+    .privacy-section ul li {
+        margin-bottom: 4px;
+    }
+    .privacy-section .highlight-box {
+        background: rgba(0, 240, 255, 0.03);
+        border-left: 3px solid #00f0ff;
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin: 10px 0;
+        color: #ccd;
+        font-size: 0.9rem;
+    }
+    .privacy-section .highlight-box.warning {
+        border-left-color: #ff9800;
+        background: rgba(255, 152, 0, 0.03);
+    }
+    .privacy-section .highlight-box.danger {
+        border-left-color: #f44336;
+        background: rgba(244, 67, 54, 0.03);
+    }
+    .privacy-section .highlight-box.success {
+        border-left-color: #4caf50;
+        background: rgba(76, 175, 80, 0.03);
+    }
+    .privacy-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        font-size: 0.85rem;
+    }
+    .privacy-table th {
+        background: rgba(255, 255, 255, 0.03);
+        color: #00f0ff;
+        padding: 10px 14px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 240, 255, 0.1);
+    }
+    .privacy-table td {
+        padding: 10px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        color: #ccd;
+    }
+    .privacy-table tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .privacy-footer {
+        text-align: center;
+        padding: 20px 0;
+        color: #667;
+        font-size: 0.8rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 20px;
+    }
+    .privacy-footer a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .privacy-footer a:hover {
+        text-decoration: underline;
+    }
+    .contact-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 8px;
+    }
+    .contact-info .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #8899aa;
+        font-size: 0.85rem;
+    }
+    .contact-info .contact-item i {
+        color: #00f0ff;
+        width: 18px;
+    }
+    @media (max-width: 576px) {
+        .privacy-section {
+            padding: 16px;
+        }
+        .privacy-section h2 {
+            font-size: 1rem;
+        }
+        .privacy-table {
+            font-size: 0.75rem;
+        }
+        .privacy-table th,
+        .privacy-table td {
+            padding: 6px 10px;
+        }
+        .contact-info {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="privacy-container">
+    <!-- Header -->
+    <div class="privacy-header">
+        <h1><i class="fas fa-shield-halved"></i> Privacy Policy</h1>
+        <div class="last-updated">Last Updated: January 15, 2024</div>
+        <p style="color: #8899aa; font-size: 0.9rem; margin-top: 8px;">
+            Your privacy matters to us. This policy explains how we collect, use, and protect your information.
+        </p>
+    </div>
+
+    <!-- Section 1: Information We Collect -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-database"></i> 1. Information We Collect</h2>
+        
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 8px;">User Information</h4>
+        <ul>
+            <li><strong>Account Data:</strong> Email address, username, and hashed password</li>
+            <li><strong>Profile Data:</strong> Full name, bio, avatar, and preferences</li>
+            <li><strong>Scan Data:</strong> URLs scanned, scan results, and security findings</li>
+            <li><strong>Usage Data:</strong> Feature usage, login history, and activity logs</li>
+        </ul>
+
+        <h4 style="color: #ccd; font-size: 0.95rem; margin-top: 12px;">Device Information</h4>
+        <ul>
+            <li><strong>Device ID:</strong> Anonymous device identifier</li>
+            <li><strong>IP Address:</strong> For security and analytics</li>
+            <li><strong>Browser/OS:</strong> Version and type information</li>
+        </ul>
+
+        <div class="highlight-box">
+            <i class="fas fa-info-circle" style="color: #00f0ff;"></i>
+            <strong>We do not collect:</strong> Sensitive personal data, financial information, or browsing history beyond what is necessary for the app's functionality.
+        </div>
+    </div>
+
+    <!-- Section 2: How We Use Your Information -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-cogs"></i> 2. How We Use Your Information</h2>
+        <ul>
+            <li><strong>Provide Services:</strong> Process scan requests and generate reports</li>
+            <li><strong>Account Management:</strong> Create and manage user accounts</li>
+            <li><strong>Improve App:</strong> Analyze usage to enhance features and performance</li>
+            <li><strong>Security:</strong> Protect against fraud, abuse, and unauthorized access</li>
+            <li><strong>Communication:</strong> Send updates, notifications, and support messages</li>
+            <li><strong>Analytics:</strong> Anonymous usage statistics to understand user behavior</li>
+        </ul>
+
+        <div class="highlight-box success">
+            <i class="fas fa-check-circle" style="color: #4caf50;"></i>
+            <strong>Your data is used solely to provide and improve the WebShield Scanner service.</strong> We never sell your personal information to third parties.
+        </div>
+    </div>
+
+    <!-- Section 3: Information Sharing -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-share-alt"></i> 3. Information Sharing</h2>
+        <p>We do not sell or rent your personal information. We share data only in these limited circumstances:</p>
+        <ul>
+            <li><strong>Service Providers:</strong> Trusted third parties who assist with:
+                <ul>
+                    <li>Analytics (anonymous)</li>
+                </ul>
+            </li>
+            <li><strong>Legal Requirements:</strong> If required by law or to protect our rights</li>
+            <li><strong>With Your Consent:</strong> When you explicitly authorize sharing</li>
+        </ul>
+
+        <div class="highlight-box warning">
+            <i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i>
+            <strong>Scan results are private.</strong> We do not share your scan results with any third party unless required by law.
+        </div>
+    </div>
+
+    <!-- Section 4: Data Security -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-lock"></i> 4. Data Security</h2>
+        <p>We implement robust security measures to protect your data:</p>
+        <ul>
+            <li><strong>Encryption:</strong> All data encrypted in transit (HTTPS/TLS 1.3)</li>
+            <li><strong>Password Protection:</strong> Passwords hashed with bcrypt</li>
+            <li><strong>Authentication:</strong> JWT-based authentication with secure tokens</li>
+            <li><strong>Database Security:</strong> Secure database with access controls</li>
+            <li><strong>Regular Audits:</strong> Periodic security reviews and updates</li>
+            <li><strong>Rate Limiting:</strong> Protection against brute force attacks</li>
+        </ul>
+
+        <div class="highlight-box success">
+            <i class="fas fa-check-circle" style="color: #4caf50;"></i>
+            <strong>We follow industry best practices for data security.</strong> Your information is stored securely and accessed only when necessary.
+        </div>
+    </div>
+
+    <!-- Section 5: Your Rights -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-user-check"></i> 5. Your Rights</h2>
+        <p>You have the following rights regarding your data:</p>
+        <ul>
+            <li><strong>Access:</strong> View all data we hold about you</li>
+            <li><strong>Correction:</strong> Update or correct your information</li>
+            <li><strong>Deletion:</strong> Delete your account and all associated data</li>
+            <li><strong>Export:</strong> Download your data in a portable format</li>
+            <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
+        </ul>
+
+        <div class="highlight-box">
+            <i class="fas fa-info-circle" style="color: #00f0ff;"></i>
+            <strong>To exercise your rights:</strong> Go to <a href="{{ url_for('page.settings') }}" style="color: #00f0ff;">Settings</a> or contact us at <a href="mailto:support@webshield-scanner.com" style="color: #00f0ff;">support@webshield-scanner.com</a>
+        </div>
+    </div>
+
+    <!-- Section 6: Data Retention -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-clock"></i> 6. Data Retention</h2>
+        <p>We retain data for the following periods:</p>
+        <table class="privacy-table">
+            <thead>
+                <tr>
+                    <th>Data Type</th>
+                    <th>Retention Period</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Account Data</td>
+                    <td>Until account deletion</td>
+                    <td>Account management</td>
+                </tr>
+                <tr>
+                    <td>Scan Results</td>
+                    <td>Until account deletion</td>
+                    <td>Report access</td>
+                </tr>
+                <tr>
+                    <td>Audit Logs</td>
+                    <td>90 days</td>
+                    <td>Security monitoring</td>
+                </tr>
+                <tr>
+                    <td>Analytics Data</td>
+                    <td>24 months</td>
+                    <td>Product improvement</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section 7: Cookies -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-cookie"></i> 7. Cookies</h2>
+        <p>We use cookies to enhance your experience:</p>
+        <ul>
+            <li><strong>Session Cookies:</strong> Keep you logged in</li>
+            <li><strong>Preferences:</strong> Remember your settings</li>
+            <li><strong>Analytics:</strong> Anonymous usage tracking</li>
+        </ul>
+        <p style="margin-top: 8px;">You can control cookies through your browser settings. Disabling cookies may affect app functionality.</p>
+    </div>
+
+    <!-- Section 8: Children's Privacy -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-child"></i> 8. Children's Privacy</h2>
+        <p>
+            WebShield Scanner is not intended for children under 13 years of age. 
+            We do not knowingly collect personal information from children. 
+            If you believe we have inadvertently collected such information, 
+            please contact us immediately.
+        </p>
+    </div>
+
+    <!-- Section 9: Changes to This Policy -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-edit"></i> 9. Changes to This Policy</h2>
+        <p>
+            We may update this Privacy Policy from time to time. We will notify you of any changes by:
+        </p>
+        <ul>
+            <li>Posting the new policy on this page</li>
+            <li>Updating the "Last Updated" date</li>
+            <li>Sending an email notification (for significant changes)</li>
+        </ul>
+        <p style="margin-top: 8px;">We encourage you to review this policy periodically.</p>
+    </div>
+
+    <!-- Section 10: Contact Us -->
+    <div class="privacy-section">
+        <h2><i class="fas fa-envelope"></i> 10. Contact Us</h2>
+        <p>If you have questions about this Privacy Policy, please contact us:</p>
+        <div class="contact-info">
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>Email: <a href="mailto:support@webshield-scanner.com" style="color: #00f0ff;">support@webshield-scanner.com</a></span>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-shield-halved"></i>
+                <span>Privacy: <a href="mailto:privacy@webshield-scanner.com" style="color: #00f0ff;">privacy@webshield-scanner.com</a></span>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-globe"></i>
+                <span>Website: <a href="https://webshield-scanner.com" style="color: #00f0ff;">webshield-scanner.com</a></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="privacy-footer">
+        <p>
+            <i class="fas fa-shield-halved" style="color: #00f0ff;"></i>
+            WebShield Scanner - Your Privacy Matters
+        </p>
+        <p>
+            <a href="{{ url_for('page.terms_of_service') }}">Terms of Service</a> &middot;
+            <a href="{{ url_for('page.legal_policy') }}">Legal Policy</a> &middot;
+            <a href="{{ url_for('page.contact') }}">Contact Us</a>
+        </p>
+        <p style="margin-top: 4px;">
+            &copy; 2024 WebShield Scanner. All rights reserved.
+        </p>
+    </div>
+</div>
+{% endblock %}

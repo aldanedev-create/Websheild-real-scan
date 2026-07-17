@@ -1,0 +1,211 @@
+/* ========================================
+   WebShield Scanner - Theme Styles
+   ======================================== */
+
+/* ----- Dark Theme (Default) ----- */
+:root {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #111128;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-card-hover: rgba(255, 255, 255, 0.06);
+  --bg-input: rgba(255, 255, 255, 0.03);
+  --bg-input-hover: rgba(255, 255, 255, 0.06);
+  --text-primary: #ffffff;
+  --text-secondary: #ccd;
+  --text-muted: #8899aa;
+  --text-dim: #667;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-hover: rgba(0, 240, 255, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-light: rgba(0, 240, 255, 0.05);
+}
+
+/* ----- Light Theme ----- */
+[data-theme="light"] {
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #e8ecf0;
+  --bg-card: rgba(255, 255, 255, 0.6);
+  --bg-card-hover: rgba(255, 255, 255, 0.8);
+  --bg-input: rgba(255, 255, 255, 0.5);
+  --bg-input-hover: rgba(255, 255, 255, 0.7);
+  --text-primary: #1a1a2e;
+  --text-secondary: #333;
+  --text-muted: #666;
+  --text-dim: #999;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --border-hover: rgba(0, 240, 255, 0.4);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-light: rgba(0, 240, 255, 0.1);
+}
+
+/* Apply theme variables */
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.app-header {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bottom-nav {
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+}
+
+.card, .scan-card, .finding-card, .settings-section {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.card:hover, .scan-card:hover, .finding-card:hover {
+  background: var(--bg-card-hover);
+}
+
+.form-control {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+.form-control:focus {
+  background: var(--bg-input-hover);
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.auth-container {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+}
+
+/* ----- Premium Badge Colors ----- */
+.premium-badge {
+  background: linear-gradient(135deg, #ffd700, #f57c00);
+  color: #fff;
+}
+
+/* ----- Status Colors ----- */
+.status-completed { color: #4caf50; }
+.status-running { color: #00f0ff; }
+.status-pending { color: #ff9800; }
+.status-failed { color: #f44336; }
+.status-cancelled { color: #8899aa; }
+
+/* ----- Score Colors ----- */
+.score-good { color: #4caf50; border-color: #4caf50; }
+.score-medium { color: #ff9800; border-color: #ff9800; }
+.score-bad { color: #f44336; border-color: #f44336; }
+
+/* ----- Severity Colors ----- */
+.severity-critical { border-left-color: #f44336; }
+.severity-high { border-left-color: #ff6b6b; }
+.severity-medium { border-left-color: #ff9800; }
+.severity-low { border-left-color: #4caf50; }
+.severity-info { border-left-color: #8899aa; }
+
+/* ----- Gradient Backgrounds ----- */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+.bg-gradient-premium {
+  background: linear-gradient(135deg, #ffd700, #f57c00);
+}
+
+/* ----- Focus Glow ----- */
+.focus-glow:focus {
+  box-shadow: 0 0 30px var(--shadow-light);
+}
+
+/* ----- Transitions ----- */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* ----- Hover Scale ----- */
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* ----- Glass Effect ----- */
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+}
+
+/* ----- Scrollbar Styling ----- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.3);
+}
+
+/* ----- Selection Color ----- */
+::selection {
+  background: rgba(0, 240, 255, 0.2);
+  color: #fff;
+}
+
+/* ----- Print Styles ----- */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    padding: 20px;
+  }
+  .page-container {
+    padding: 0;
+    max-width: 100%;
+  }
+  .card, .scan-card, .finding-card {
+    border: 1px solid #ddd;
+    background: #fff;
+    page-break-inside: avoid;
+  }
+  .card:hover, .scan-card:hover, .finding-card:hover {
+    transform: none;
+    background: #fff;
+  }
+  .score-ring {
+    border-color: #333;
+  }
+  .score-good { color: #2e7d32; }
+  .score-medium { color: #e65100; }
+  .score-bad { color: #c62828; }
+}
+
+/* ----- Reduced Motion ----- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ----- High Contrast ----- */
+@media (prefers-contrast: high) {
+  .card, .scan-card, .finding-card {
+    border-color: var(--text-primary);
+    border-width: 2px;
+  }
+  .text-muted {
+    color: var(--text-secondary);
+  }
+  .text-dim {
+    color: var(--text-muted);
+  }
+}

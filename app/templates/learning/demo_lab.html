@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block title %}Demo Lab - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .demo-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    .demo-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .demo-header h2 {
+        font-family: 'Orbitron', monospace;
+        color: #00f0ff;
+    }
+    .demo-header p {
+        color: #8899aa;
+    }
+    .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 15px;
+    }
+    .demo-card {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: #fff;
+        display: block;
+    }
+    .demo-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(0, 240, 255, 0.2);
+        transform: translateY(-2px);
+        color: #fff;
+    }
+    .demo-card .icon {
+        font-size: 2.5rem;
+        color: #00f0ff;
+        margin-bottom: 10px;
+    }
+    .demo-card h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .demo-card p {
+        font-size: 0.8rem;
+        color: #8899aa;
+        margin: 0;
+    }
+    .demo-card .badge-demo {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 10px;
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 8px;
+        background: rgba(0, 240, 255, 0.1);
+        color: #00f0ff;
+    }
+    .demo-content {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 25px;
+        display: none;
+    }
+    .demo-content.active {
+        display: block;
+    }
+    .demo-content h3 {
+        color: #00f0ff;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+    .demo-content .code-block {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        color: #ccd;
+        overflow-x: auto;
+        margin: 10px 0;
+    }
+    .demo-content .code-block .comment {
+        color: #667;
+    }
+    .demo-content .code-block .keyword {
+        color: #00f0ff;
+    }
+    .demo-content .code-block .string {
+        color: #4caf50;
+    }
+    .demo-content .code-block .function {
+        color: #ff9800;
+    }
+    .demo-content .vulnerable {
+        border-left: 4px solid #f44336;
+        padding: 12px 16px;
+        background: rgba(244, 67, 54, 0.05);
+        border-radius: 0 8px 8px 0;
+        margin: 10px 0;
+    }
+    .demo-content .vulnerable .label {
+        color: #f44336;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+    .demo-content .secure {
+        border-left: 4px solid #4caf50;
+        padding: 12px 16px;
+        background: rgba(76, 175, 80, 0.05);
+        border-radius: 0 8px 8px 0;
+        margin: 10px 0;
+    }
+    .demo-content .secure .label {
+        color: #4caf50;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+    .demo-content .explanation {
+        background: rgba(0, 240, 255, 0.03);
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin: 10px 0;
+        color: #ccd;
+        font-size: 0.9rem;
+    }
+    .demo-content .explanation i {
+        color: #00f0ff;
+        margin-right: 8px;
+    }
+    .demo-content .btn-demo {
+        background: linear-gradient(135deg, #00f0ff, #0066ff);
+        border: none;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+    .demo-content .btn-demo:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+    }
+    .back-to-lessons {
+        display: inline-block;
+        color: #8899aa;
+        text-decoration: none;
+        margin-bottom: 15px;
+        transition: color 0.3s ease;
+    }
+    .back-to-lessons:hover {
+        color: #00f0ff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="demo-container">
+    <a href="{{ url_for('page.learning_center') }}" class="back-to-lessons">
+        <i class="fas fa-arrow-left"></i> Back to Learning Center
+    </a>
+    
+    <div class="demo-header">
+        <h2><i class="fas fa-flask"></i> Demo Lab</h2>
+        <p>Interactive demonstrations of security vulnerabilities and their fixes</p>
+    </div>
+    
+    <div class="demo-grid">
+        <div class="demo-card" onclick="showDemo('sql-injection')">
+            <div class="icon"><i class="fas fa-database"></i></div>
+            <h4>SQL Injection</h4>
+            <p>See how SQL injection works and how to prevent it</p>
+            <span class="badge-demo">Interactive</span>
+        </div>
+        
+        <div class="demo-card" onclick="showDemo('xss')">
+            <div class="icon"><i class="fas fa-code"></i></div>
+            <h4>Cross-Site Scripting (XSS)</h4>
+            <p>Understand XSS attacks and proper sanitization</p>
+            <span class="badge-demo">Interactive</span>
+        </div>
+        
+        <div class="demo-card" onclick="showDemo('csrf')">
+            <div class="icon"><i class="fas fa-user-secret"></i></div>
+            <h4>CSRF Attack</h4>
+            <p>Learn how CSRF works and how to protect against it</p>
+            <span class="badge-demo">Interactive</span>
+        </div>
+        
+        <div class="demo-card" onclick="showDemo('headers')">
+            <div class="icon"><i class="fas fa-shield-halved"></i></div>
+            <h4>Security Headers</h4>
+            <p>Configure security headers correctly</p>
+            <span class="badge-demo">Interactive</span>
+        </div>
+    </div>
+    
+    <!-- SQL Injection Demo -->
+    <div id="demo-sql-injection" class="demo-content">
+        <h3><i class="fas fa-database"></i> SQL Injection Demo</h3>
+        
+        <div class="explanation">
+            <i class="fas fa-info-circle"></i>
+            This demo shows a vulnerable login form that is susceptible to SQL injection.
+        </div>
+        
+        <h4>Vulnerable Code</h4>
+        <div class="vulnerable">
+            <div class="label">❌ Vulnerable</div>
+            <div class="code-block">
+                <span class="comment">// This code is vulnerable to SQL injection</span>
+                <span class="keyword">query</span> = <span class="string">"SELECT * FROM users WHERE username = '"</span> + username + <span class="string">"' AND password = '"</span> + password + <span class="string">"'"</span>
+                <span class="keyword">result</span> = db.execute(query)
+            </div>
+        </div>
+        
+        <h4>Attack Example</h4>
+        <div class="code-block">
+            <span class="comment">// An attacker could input:</span>
+            username = <span class="string">"' OR '1'='1"</span>
+            password = <span class="string">"' OR '1'='1"</span>
+            <span class="comment">// Resulting query:</span>
+            <span class="keyword">query</span> = <span class="string">"SELECT * FROM users WHERE username = '' OR '1'='1' AND password = '' OR '1'='1'"</span>
+        </div>
+        
+        <h4>Secure Code</h4>
+        <div class="secure">
+            <div class="label">✅ Secure</div>
+            <div class="code-block">
+                <span class="comment">// Using parameterized queries prevents injection</span>
+                <span class="keyword">query</span> = <span class="string">"SELECT * FROM users WHERE username = ? AND password = ?"</span>
+                <span class="keyword">result</span> = db.execute(query, (username, password))
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Key Takeaway:</strong> Always use parameterized queries or an ORM. Never concatenate user input directly into SQL queries.
+        </div>
+    </div>
+    
+    <!-- XSS Demo -->
+    <div id="demo-xss" class="demo-content">
+        <h3><i class="fas fa-code"></i> Cross-Site Scripting (XSS) Demo</h3>
+        
+        <div class="explanation">
+            <i class="fas fa-info-circle"></i>
+            This demo shows how XSS occurs when user input is rendered without sanitization.
+        </div>
+        
+        <h4>Vulnerable Code</h4>
+        <div class="vulnerable">
+            <div class="label">❌ Vulnerable</div>
+            <div class="code-block">
+                <span class="comment">&lt;!-- User input is rendered directly --&gt;</span>
+                &lt;div&gt;<span class="string">Welcome, {{ user_input }}</span>&lt;/div&gt;
+            </div>
+        </div>
+        
+        <h4>Attack Example</h4>
+        <div class="code-block">
+            <span class="comment">// An attacker could input:</span>
+            user_input = <span class="string">"&lt;script&gt;alert('XSS')&lt;/script&gt;"</span>
+            <span class="comment">// Resulting HTML:</span>
+            &lt;div&gt;<span class="string">&lt;script&gt;alert('XSS')&lt;/script&gt;</span>&lt;/div&gt;
+        </div>
+        
+        <h4>Secure Code</h4>
+        <div class="secure">
+            <div class="label">✅ Secure</div>
+            <div class="code-block">
+                <span class="comment">// Using auto-escaping or sanitization</span>
+                &lt;div&gt;<span class="string">Welcome, {{ escape(user_input) }}</span>&lt;/div&gt;
+                <span class="comment">// Result: Welcome, &amp;lt;script&amp;gt;alert('XSS')&amp;lt;/script&amp;gt;</span>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Key Takeaway:</strong> Always escape user input when rendering in HTML. Use Content Security Policy (CSP) headers for additional protection.
+        </div>
+    </div>
+    
+    <!-- CSRF Demo -->
+    <div id="demo-csrf" class="demo-content">
+        <h3><i class="fas fa-user-secret"></i> CSRF Attack Demo</h3>
+        
+        <div class="explanation">
+            <i class="fas fa-info-circle"></i>
+            This demo shows how CSRF attacks work and how to prevent them.
+        </div>
+        
+        <h4>Vulnerable Form</h4>
+        <div class="vulnerable">
+            <div class="label">❌ Vulnerable</div>
+            <div class="code-block">
+                <span class="comment">&lt;!-- No CSRF protection --&gt;</span>
+                &lt;form action=<span class="string">"/transfer"</span> method=<span class="string">"POST"</span>&gt;
+                    &lt;input type=<span class="string">"hidden"</span> name=<span class="string">"amount"</span> value=<span class="string">"1000"</span>&gt;
+                    &lt;input type=<span class="string">"hidden"</span> name=<span class="string">"to"</span> value=<span class="string">"attacker"</span>&gt;
+                    &lt;button type=<span class="string">"submit"</span>&gt;Transfer&lt;/button&gt;
+                &lt;/form&gt;
+            </div>
+        </div>
+        
+        <h4>Attack Example</h4>
+        <div class="code-block">
+            <span class="comment">&lt;!-- Malicious site makes the request --&gt;</span>
+            &lt;img src=<span class="string">"https://bank.com/transfer?amount=1000&to=attacker"</span>&gt;
+        </div>
+        
+        <h4>Secure Code</h4>
+        <div class="secure">
+            <div class="label">✅ Secure</div>
+            <div class="code-block">
+                <span class="comment">&lt;!-- With CSRF token --&gt;</span>
+                &lt;form action=<span class="string">"/transfer"</span> method=<span class="string">"POST"</span>&gt;
+                    &lt;input type=<span class="string">"hidden"</span> name=<span class="string">"csrf_token"</span> value=<span class="string">"{{ csrf_token() }}"</span>&gt;
+                    &lt;input type=<span class="string">"hidden"</span> name=<span class="string">"amount"</span> value=<span class="string">"1000"</span>&gt;
+                    &lt;input type=<span class="string">"hidden"</span> name=<span class="string">"to"</span> value=<span class="string">"recipient"</span>&gt;
+                    &lt;button type=<span class="string">"submit"</span>&gt;Transfer&lt;/button&gt;
+                &lt;/form&gt;
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Key Takeaway:</strong> Always include CSRF tokens in forms that perform state-changing actions. Use SameSite cookies for additional protection.
+        </div>
+    </div>
+    
+    <!-- Security Headers Demo -->
+    <div id="demo-headers" class="demo-content">
+        <h3><i class="fas fa-shield-halved"></i> Security Headers Demo</h3>
+        
+        <div class="explanation">
+            <i class="fas fa-info-circle"></i>
+            This demo shows the difference between a site with and without proper security headers.
+        </div>
+        
+        <h4>Missing Headers</h4>
+        <div class="vulnerable">
+            <div class="label">❌ Vulnerable</div>
+            <div class="code-block">
+                <span class="comment"># Response headers</span>
+                <span class="keyword">Content-Type</span>: text/html
+                <span class="keyword">Server</span>: nginx
+                <span class="comment"># Missing security headers!</span>
+            </div>
+        </div>
+        
+        <h4>Secure Headers</h4>
+        <div class="secure">
+            <div class="label">✅ Secure</div>
+            <div class="code-block">
+                <span class="comment"># Complete security headers</span>
+                <span class="keyword">Content-Security-Policy</span>: default-src 'self'; script-src 'self' 'unsafe-inline'
+                <span class="keyword">Strict-Transport-Security</span>: max-age=31536000; includeSubDomains
+                <span class="keyword">X-Frame-Options</span>: DENY
+                <span class="keyword">X-Content-Type-Options</span>: nosniff
+                <span class="keyword">Referrer-Policy</span>: strict-origin-when-cross-origin
+                <span class="keyword">Permissions-Policy</span>: geolocation=(), microphone=(), camera=()
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Key Takeaway:</strong> Implement all major security headers to protect against XSS, clickjacking, MIME sniffing, and other attacks.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showDemo(demoId) {
+        // Hide all demos
+        document.querySelectorAll('.demo-content').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        // Show selected demo
+        const demo = document.getElementById('demo-' + demoId);
+        if (demo) {
+            demo.classList.add('active');
+            // Scroll to demo
+            demo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+    
+    // Show first demo by default
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if URL has hash
+        if (window.location.hash) {
+            const demoId = window.location.hash.replace('#', '');
+            showDemo(demoId);
+        } else {
+            // Show first demo by default
+            const firstDemo = document.querySelector('.demo-card');
+            if (firstDemo) {
+                firstDemo.click();
+            }
+        }
+    });
+</script>
+{% endblock %}

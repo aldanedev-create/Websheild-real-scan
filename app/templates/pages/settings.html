@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - WebShield Scanner{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+    .settings-section {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .settings-section h4 {
+        font-size: 0.9rem;
+        color: #00f0ff;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .settings-section .form-label {
+        color: #8899aa;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .settings-section .form-control {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    .settings-section .form-control:focus {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #00f0ff;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.05);
+        color: #fff;
+    }
+    .settings-section .form-control::placeholder {
+        color: #556;
+    }
+    .settings-section .form-control-plaintext {
+        color: #ccd;
+        font-size: 0.9rem;
+    }
+    .settings-section .form-check-label {
+        color: #ccd;
+        font-size: 0.85rem;
+    }
+    .settings-section .form-check-input {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    .settings-section .form-check-input:checked {
+        background-color: #00f0ff;
+        border-color: #00f0ff;
+    }
+    .settings-section .btn-save {
+        background: linear-gradient(135deg, #00f0ff, #0066ff);
+        border: none;
+        color: #fff;
+        padding: 8px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+    .settings-section .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+    }
+    .settings-section .btn-danger-outline {
+        background: transparent;
+        border: 1px solid rgba(244, 67, 54, 0.3);
+        color: #f44336;
+        padding: 8px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .settings-section .btn-danger-outline:hover {
+        background: rgba(244, 67, 54, 0.1);
+        border-color: #f44336;
+    }
+    .settings-section .text-muted-small {
+        font-size: 0.7rem;
+        color: #667;
+        margin-top: 4px;
+    }
+    .settings-divider {
+        border-color: rgba(255, 255, 255, 0.05);
+        margin: 20px 0;
+    }
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(0, 240, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: #00f0ff;
+        border: 2px solid rgba(0, 240, 255, 0.2);
+    }
+    .security-info {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        font-size: 0.8rem;
+        color: #8899aa;
+    }
+    .security-info .item {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 6px 14px;
+        border-radius: 6px;
+    }
+    .security-info .item .label {
+        color: #667;
+    }
+    .security-info .item .value {
+        color: #ccd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <h2 class="page-title"><i class="fas fa-cog"></i> Settings</h2>
+    
+    <!-- Profile Section -->
+    <div class="settings-section">
+        <h4><i class="fas fa-user"></i> Profile</h4>
+        <form id="profile-form">
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="full-name" value="{{ current_user.full_name or '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" value="{{ current_user.username }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" value="{{ current_user.email }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" rows="2">{{ current_user.bio or '' }}</textarea>
+            </div>
+            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Profile</button>
+        </form>
+    </div>
+    
+    <!-- Preferences Section -->
+    <div class="settings-section">
+        <h4><i class="fas fa-sliders-h"></i> Preferences</h4>
+        <form id="preferences-form">
+            <div class="mb-3">
+                <label class="form-label">Theme</label>
+                <select class="form-control" id="theme">
+                    <option value="dark" {% if current_user.theme == 'dark' %}selected{% endif %}>Dark</option>
+                    <option value="light" {% if current_user.theme == 'light' %}selected{% endif %}>Light</option>
+                </select>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="notifications" {% if current_user.notifications_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="notifications">Enable notifications</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="marketing" {% if current_user.marketing_emails %}checked{% endif %}>
+                <label class="form-check-label" for="marketing">Receive marketing emails</label>
+            </div>
+            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Preferences</button>
+        </form>
+    </div>
+    
+    <!-- Security Section -->
+    <div class="settings-section">
+        <h4><i class="fas fa-shield-halved"></i> Security</h4>
+        <form id="password-form">
+            <div class="mb-3">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-control" id="current-password" placeholder="Enter current password" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-control" id="new-password" placeholder="Enter new password" required>
+                <div class="text-muted-small">Minimum 8 characters with uppercase, lowercase, and numbers</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" class="form-control" id="confirm-password" placeholder="Confirm new password" required>
+            </div>
+            <button type="submit" class="btn-save"><i class="fas fa-key"></i> Change Password</button>
+        </form>
+    </div>
+    
+    <!-- Account Section -->
+    <div class="settings-section">
+        <h4><i class="fas fa-user-circle"></i> Account</h4>
+        <div class="security-info mb-3">
+            <div class="item">
+                <span class="label">Plan: </span>
+                <span class="value">{{ current_user.plan|capitalize }}</span>
+            </div>
+            <div class="item">
+                <span class="label">Member since: </span>
+                <span class="value">{{ current_user.created_at.strftime('%b %d, %Y') if current_user.created_at else 'N/A' }}</span>
+            </div>
+            <div class="item">
+                <span class="label">Total scans: </span>
+                <span class="value">{{ current_user.total_scans }}</span>
+            </div>
+        </div>
+        <button class="btn-danger-outline" onclick="deleteAccount()">
+            <i class="fas fa-trash"></i> Delete Account
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initSettings();
+    });
+</script>
+{% endblock %}

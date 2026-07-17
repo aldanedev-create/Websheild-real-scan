@@ -1,0 +1,301 @@
+/* ========================================
+   WebShield Scanner - Mobile Styles
+   ======================================== */
+
+/* ----- Mobile First ----- */
+@media (max-width: 768px) {
+    /* Typography */
+    body {
+        font-size: 14px;
+    }
+    h1 {
+        font-size: 1.4rem;
+    }
+    h2 {
+        font-size: 1.2rem;
+    }
+    h3 {
+        font-size: 1rem;
+    }
+    h4 {
+        font-size: 0.9rem;
+    }
+    .page-title {
+        font-size: 1.1rem;
+    }
+
+    /* Layout */
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .main-content {
+        padding: 10px 12px 65px 12px;
+    }
+    .row {
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+    .row > * {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Cards */
+    .card {
+        border-radius: 10px;
+    }
+    .card-body {
+        padding: 14px;
+    }
+    .card-header {
+        padding: 10px 14px;
+    }
+    .card-footer {
+        padding: 10px 14px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+    .btn-sm {
+        padding: 4px 10px;
+        font-size: 0.7rem;
+    }
+    .btn-lg {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+
+    /* Forms */
+    .form-control {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    .form-label {
+        font-size: 0.8rem;
+    }
+
+    /* Modals */
+    .modal-dialog {
+        margin: 8px;
+    }
+    .modal-content {
+        border-radius: 12px;
+    }
+    .modal-header {
+        padding: 12px 16px;
+    }
+    .modal-body {
+        padding: 16px;
+    }
+    .modal-footer {
+        padding: 12px 16px;
+    }
+
+    /* Tables - horizontal scroll */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table {
+        font-size: 0.8rem;
+    }
+    .table td,
+    .table th {
+        padding: 6px 8px;
+        white-space: nowrap;
+    }
+}
+
+/* ----- Small Phones ----- */
+@media (max-width: 400px) {
+    body {
+        font-size: 13px;
+    }
+    .main-content {
+        padding: 8px 8px 55px 8px;
+    }
+    .container {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    .page-title {
+        font-size: 1rem;
+    }
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ----- Touch Optimizations ----- */
+@media (hover: none) {
+    /* Larger touch targets */
+    .btn,
+    .nav-link,
+    .bottom-nav-item,
+    .quick-action-btn,
+    .lesson-card,
+    .scan-card {
+        min-height: 44px;
+        cursor: default;
+    }
+    .nav-link {
+        padding: 10px 14px;
+    }
+    .bottom-nav-item {
+        padding: 6px 8px;
+        min-height: 44px;
+    }
+
+    /* Remove hover effects that don't work on touch */
+    .hover-scale:hover {
+        transform: none;
+    }
+    .card:hover {
+        transform: none;
+    }
+}
+
+/* ----- Safe Area (Notch phones) ----- */
+@supports (padding: max(0px)) {
+    .bottom-nav {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+    .main-content {
+        padding-bottom: max(65px, calc(env(safe-area-inset-bottom) + 60px));
+    }
+    .ad-banner-wrapper {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+}
+
+/* ----- Dark Mode Support ----- */
+@media (prefers-color-scheme: light) {
+    /* This is handled by our dark theme being the default */
+    /* Users can override with theme selector */
+}
+
+/* ----- Print ----- */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        background: #fff;
+        color: #000;
+        padding: 20px;
+    }
+    .main-content {
+        padding: 0;
+        max-width: 100%;
+    }
+    .card {
+        border: 1px solid #ddd;
+        background: #fff;
+    }
+    .card:hover {
+        transform: none;
+    }
+    .scan-card {
+        border: 1px solid #ddd;
+        background: #fff;
+        page-break-inside: avoid;
+    }
+    .finding-item {
+        border: 1px solid #ddd;
+        background: #fff;
+        page-break-inside: avoid;
+    }
+    .stat-card {
+        border: 1px solid #ddd;
+        background: #f9f9f9;
+    }
+    .score-ring {
+        border-color: #333;
+    }
+    .score-good {
+        color: #2e7d32;
+    }
+    .score-medium {
+        color: #e65100;
+    }
+    .score-bad {
+        color: #c62828;
+    }
+}
+
+/* ----- Reduced Motion ----- */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ----- High Contrast ----- */
+@media (prefers-contrast: high) {
+    .card,
+    .scan-card,
+    .finding-item,
+    .stat-card {
+        border-color: #fff;
+        border-width: 2px;
+    }
+    .text-muted {
+        color: #aaa;
+    }
+    .text-dim {
+        color: #888;
+    }
+}
+
+/* ----- Font Size Accessibility ----- */
+@media (prefers-reduced-motion: reduce) {
+    /* Already handled above */
+}
+
+/* ----- Landscape Phones ----- */
+@media (max-width: 768px) and (orientation: landscape) {
+    .bottom-nav {
+        height: 48px;
+    }
+    .bottom-nav-item i {
+        font-size: 1rem;
+    }
+    .bottom-nav-item span {
+        font-size: 0.45rem;
+    }
+    .main-content {
+        padding-bottom: 55px;
+    }
+    .navbar {
+        min-height: 48px;
+    }
+    body {
+        padding-top: 48px;
+    }
+    .navbar-brand img {
+        height: 28px;
+    }
+    .user-avatar-nav {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+}
+
+/* ----- Dark Scrollbar (Mobile) ----- */
+@media (max-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(0, 240, 255, 0.1);
+    }
+}
