@@ -11,7 +11,7 @@ Flask-Mail==0.10.0
 Flask-Session==0.8.0
 
 # Database
-psycopg[binary]==3.2.3
+psycopg[binary]==3.2.13
 SQLAlchemy==2.0.36
 alembic==1.14.0
 
