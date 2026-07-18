@@ -237,6 +237,10 @@ class Config:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@webshield-scanner.com')
+    PUBLIC_WEB_URL = os.getenv(
+        'PUBLIC_WEB_URL',
+        'https://websheild-real-scan.onrender.com'
+    ).rstrip('/')
     
     # Logging Configuration
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
