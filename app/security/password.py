@@ -20,10 +20,7 @@ class PasswordPolicy:
     # Default policy settings
     MIN_LENGTH = 8
     MAX_LENGTH = 128
-    REQUIRE_UPPERCASE = True
-    REQUIRE_LOWERCASE = True
-    REQUIRE_DIGITS = True
-    REQUIRE_SPECIAL = True
+    REQUIRED_CHARACTER_TYPES = 3
     
     # Common password blacklist
     COMMON_PASSWORDS = {
@@ -54,21 +51,20 @@ class PasswordPolicy:
         if len(password) > cls.MAX_LENGTH:
             return False, f"Password must be no more than {cls.MAX_LENGTH} characters long"
         
-        # Check for uppercase
-        if cls.REQUIRE_UPPERCASE and not re.search(r'[A-Z]', password):
-            return False, "Password must contain at least one uppercase letter"
-        
-        # Check for lowercase
-        if cls.REQUIRE_LOWERCASE and not re.search(r'[a-z]', password):
-            return False, "Password must contain at least one lowercase letter"
-        
-        # Check for digits
-        if cls.REQUIRE_DIGITS and not re.search(r'\d', password):
-            return False, "Password must contain at least one number"
-        
-        # Check for special characters
-        if cls.REQUIRE_SPECIAL and not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-            return False, "Password must contain at least one special character"
+        # Require any three of four character types. Accept the full range
+        # of normal password-manager symbols instead of a narrow allowlist.
+        character_types = [
+            bool(re.search(r'[A-Z]', password)),
+            bool(re.search(r'[a-z]', password)),
+            bool(re.search(r'\d', password)),
+            bool(re.search(r'[^A-Za-z0-9\s]', password)),
+        ]
+
+        if sum(character_types) < cls.REQUIRED_CHARACTER_TYPES:
+            return False, (
+                "Password must use at least 3 of: uppercase, lowercase, "
+                "number, or symbol"
+            )
         
         # Check for common passwords
         if password.lower() in cls.COMMON_PASSWORDS:
@@ -203,7 +199,7 @@ class PasswordPolicy:
         has_upper = bool(re.search(r'[A-Z]', password))
         has_lower = bool(re.search(r'[a-z]', password))
         has_digit = bool(re.search(r'\d', password))
-        has_special = bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password))
+    has_special = bool(re.search(r'[^A-Za-z0-9\s]', password))
         
         variety_count = sum([has_upper, has_lower, has_digit, has_special])
         score += variety_count
