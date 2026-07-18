@@ -14,6 +14,8 @@ from flask_jwt_extended import (
     jwt_required, verify_jwt_in_request, get_jwt_identity, get_jwt, decode_token
 )
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Message
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from extensions import db, limiter, mail
 from app.models.user import User
 from app.models.audit_log import AuditLog
@@ -24,6 +26,11 @@ auth_bp = Blueprint('auth', __name__)
 
 
 REFRESH_COOKIE_NAME = 'webshield_refresh_token'
+PASSWORD_RESET_MAX_AGE = 60 * 60
+
+
+def _password_reset_serializer():
+    return URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
 
 def _refresh_cookie_max_age(remember=False):
@@ -551,8 +558,33 @@ def forgot_password():
         # Always return success even if user not found (security through obscurity)
         # In production, this would send a reset email
         if user:
-            # Generate reset token and send email
-            # For now, just log it
+            reset_token = _password_reset_serializer().dumps(
+                {'user_id': user.id, 'email': user.email},
+                salt='password-reset'
+            )
+            public_url = current_app.config.get(
+                'PUBLIC_WEB_URL',
+                'https://websheild-real-scan.onrender.com'
+            ).rstrip('/')
+            reset_url = f'{public_url}/reset-password/{reset_token}'
+
+            if current_app.config.get('MAIL_USERNAME'):
+                try:
+                    mail.send(Message(
+                        subject='Reset your WebShield password',
+                        recipients=[user.email],
+                        body=f'Use this secure link within one hour to reset your password: {reset_url}',
+                        html=(
+                            '<p>A password reset was requested for your WebShield account.</p>'
+                            f'<p><a href="{reset_url}">Reset password</a></p>'
+                            '<p>This link expires in one hour. Ignore this message if you did not request it.</p>'
+                        )
+                    ))
+                except Exception as mail_error:
+                    current_app.logger.error('Password reset email failed: %s', mail_error)
+            else:
+                current_app.logger.warning('MAIL_USERNAME is not configured; reset email was not sent.')
+
             AuditLog.log(
                 user_id=user.id,
                 action='password_reset_requested',
@@ -592,3 +624,49 @@ def verify_email(token):
             'error': 'verification_failed',
             'message': 'Could not verify email'
         }), 500
+
+
+@auth_bp.route('/reset-password', methods=['POST'])
+@limiter.limit('5 per hour')
+def reset_password():
+    """Reset a password using a signed, one-hour token."""
+    try:
+        data = request.get_json(silent=True) or {}
+        token = data.get('token', '').strip()
+        password = data.get('password', '')
+        if not token or not password:
+            return jsonify({'error': 'missing_fields', 'message': 'Reset token and password are required'}), 400
+        if not validate_password(password):
+            return jsonify({
+                'error': 'invalid_password',
+                'message': 'Password must be at least 8 characters and use at least 3 of: uppercase, lowercase, number, or symbol'
+            }), 400
+
+        payload = _password_reset_serializer().loads(
+            token,
+            salt='password-reset',
+            max_age=PASSWORD_RESET_MAX_AGE
+        )
+        user = User.query.filter_by(id=payload.get('user_id'), email=payload.get('email')).first()
+        if not user or not user.is_active:
+            return jsonify({'error': 'invalid_token', 'message': 'This reset link is invalid or expired'}), 400
+
+        user.set_password(password)
+        db.session.commit()
+        AuditLog.log(
+            user_id=user.id,
+            action='password_reset_completed',
+            details='User reset password with a signed token',
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent'),
+            severity='warning'
+        )
+        return jsonify({'success': True, 'message': 'Password reset successfully'}), 200
+    except SignatureExpired:
+        return jsonify({'error': 'expired_token', 'message': 'This reset link has expired'}), 400
+    except BadSignature:
+        return jsonify({'error': 'invalid_token', 'message': 'This reset link is invalid'}), 400
+    except Exception as error:
+        db.session.rollback()
+        current_app.logger.error('Reset password error: %s', error)
+        return jsonify({'error': 'reset_failed', 'message': 'Could not reset password'}), 500
