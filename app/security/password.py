@@ -1,272 +1,526 @@
 # -*- coding: utf-8 -*-
 
 """
-WebShield Scanner - Password Policy
-Defines and enforces password security policies.
+WebShield Scanner - Authentication Service
+Handles user authentication, registration, and authorization logic.
 """
 
 import re
-import hashlib
-import secrets
-from datetime import datetime
-from flask import current_app
+from datetime import datetime, timedelta
+from flask import current_app, request
+from flask_jwt_extended import create_access_token, create_refresh_token, decode_token
+from extensions import db
+from app.models.user import User
+from app.models.audit_log import AuditLog
+from app.utils.validators import validate_email, validate_password, validate_username
 
 
-class PasswordPolicy:
-    """
-    Password policy enforcement for security.
-    """
+class AuthService:
+    """Service for handling authentication operations."""
     
-    # Default policy settings
-    MIN_LENGTH = 8
-    MAX_LENGTH = 128
-    REQUIRED_CHARACTER_TYPES = 3
-    
-    # Common password blacklist
-    COMMON_PASSWORDS = {
-        'password', '123456', '12345678', '123456789', 'qwerty',
-        'abc123', 'password1', 'admin', 'admin123', 'letmein',
-        'welcome', 'monkey', 'dragon', 'master', 'hello',
-        'freedom', 'whatever', 'qwertyuiop', '123123', 'iloveyou'
-    }
-    
-    @classmethod
-    def validate_password(cls, password):
+    @staticmethod
+    def register_user(username, email, password, full_name=None):
         """
-        Validate a password against the policy.
+        Register a new user.
         
         Args:
-            password: Password to validate
+            username: Username
+            email: Email address
+            password: Password
+            full_name: Full name (optional)
             
         Returns:
-            tuple: (is_valid, error_message)
+            dict: User data and tokens
+            
+        Raises:
+            ValueError: Validation errors
         """
+        # Validate inputs
+        if not username:
+            raise ValueError("Username is required")
+        if not email:
+            raise ValueError("Email is required")
         if not password:
-            return False, "Password is required"
+            raise ValueError("Password is required")
         
-        # Check length
-        if len(password) < cls.MIN_LENGTH:
-            return False, f"Password must be at least {cls.MIN_LENGTH} characters long"
+        # Validate username
+        if not validate_username(username):
+            raise ValueError("Username must be 3-30 characters, alphanumeric with underscores")
         
-        if len(password) > cls.MAX_LENGTH:
-            return False, f"Password must be no more than {cls.MAX_LENGTH} characters long"
+        # Validate email
+        if not validate_email(email):
+            raise ValueError("Please provide a valid email address")
         
-        # Require any three of four character types. Accept the full range
-        # of normal password-manager symbols instead of a narrow allowlist.
-        character_types = [
-            bool(re.search(r'[A-Z]', password)),
-            bool(re.search(r'[a-z]', password)),
-            bool(re.search(r'\d', password)),
-            bool(re.search(r'[^A-Za-z0-9\s]', password)),
+        # Validate password
+        if not validate_password(password):
+            raise ValueError("Password must be at least 8 characters and use at least 3 of: uppercase, lowercase, number, or symbol")
+        
+        # Check if user exists
+        if User.query.filter_by(username=username.lower()).first():
+            raise ValueError("Username already taken")
+        
+        if User.query.filter_by(email=email.lower()).first():
+            raise ValueError("Email already registered")
+        
+        # Create user
+        user = User(
+            username=username.lower(),
+            email=email.lower(),
+            full_name=full_name,
+            password=password
+        )
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        # Log registration
+        AuditService.log(
+            user_id=user.id,
+            action='register',
+            details=f'User registered with email {email}',
+            ip_address=request.remote_addr if request else None,
+            user_agent=request.headers.get('User-Agent') if request else None
+        )
+        
+        # Generate tokens
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+        
+        return {
+            'user': user.to_dict(),
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }
+    
+    @staticmethod
+    def login_user(identifier, password, remember=False):
+        """
+        Authenticate and login a user.
+        
+        Args:
+            identifier: Email or username
+            password: Password
+            remember: Remember me flag
+            
+        Returns:
+            dict: User data and tokens
+            
+        Raises:
+            ValueError: Authentication errors
+        """
+        if not identifier or not password:
+            raise ValueError("Email/username and password are required")
+        
+        # Find user by email or username
+        user = User.query.filter(
+            (User.email == identifier.lower()) | (User.username == identifier.lower())
+        ).first()
+        
+        if not user:
+            raise ValueError("Invalid credentials")
+        
+        # Check if account is locked
+        if user.is_locked():
+            raise ValueError("Account temporarily locked due to too many failed attempts")
+        
+        # Check password
+        if not user.check_password(password):
+            user.increment_login_attempts()
+            db.session.commit()
+            raise ValueError("Invalid credentials")
+        
+        # Check if account is active
+        if not user.is_active:
+            raise ValueError("Account is deactivated. Please contact support.")
+        
+        # Record successful login
+        user.record_login(request.remote_addr if request else None)
+        db.session.commit()
+        
+        # Log login
+        AuditService.log(
+            user_id=user.id,
+            action='login',
+            details=f'User logged in from {request.remote_addr if request else "unknown"}',
+            ip_address=request.remote_addr if request else None,
+            user_agent=request.headers.get('User-Agent') if request else None
+        )
+        
+        # Generate tokens
+        access_token = create_access_token(
+            identity=user.id,
+            expires_delta=timedelta(days=7 if remember else 1)
+        )
+        refresh_token = create_refresh_token(identity=user.id)
+        
+        return {
+            'user': user.to_dict(),
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'is_premium': user.is_premium()
+        }
+    
+    @staticmethod
+    def logout_user(user_id):
+        """
+        Logout a user.
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            bool: Success status
+        """
+        AuditService.log(
+            user_id=user_id,
+            action='logout',
+            details='User logged out',
+            ip_address=request.remote_addr if request else None,
+            user_agent=request.headers.get('User-Agent') if request else None
+        )
+        
+        return True
+    
+    @staticmethod
+    def refresh_token(user_id):
+        """
+        Refresh access token.
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            str: New access token
+            
+        Raises:
+            ValueError: User not found
+        """
+        user = User.query.get(user_id)
+        
+        if not user:
+            raise ValueError("User not found")
+        
+        if not user.is_active:
+            raise ValueError("Account is deactivated")
+        
+        return create_access_token(identity=user.id)
+    
+    @staticmethod
+    def change_password(user_id, current_password, new_password):
+        """
+        Change user password.
+        
+        Args:
+            user_id: User ID
+            current_password: Current password
+            new_password: New password
+            
+        Returns:
+            bool: Success status
+            
+        Raises:
+            ValueError: Validation errors
+        """
+        user = User.query.get(user_id)
+        
+        if not user:
+            raise ValueError("User not found")
+        
+        if not current_password or not new_password:
+            raise ValueError("Current password and new password are required")
+        
+        # Verify current password
+        if not user.check_password(current_password):
+            raise ValueError("Current password is incorrect")
+        
+        # Validate new password
+        if not validate_password(new_password):
+            raise ValueError("Password must be at least 8 characters and use at least 3 of: uppercase, lowercase, number, or symbol")
+        
+        # Update password
+        user.set_password(new_password)
+        db.session.commit()
+        
+        # Log password change
+        AuditService.log(
+            user_id=user.id,
+            action='password_changed',
+            details='User changed password',
+            ip_address=request.remote_addr if request else None,
+            user_agent=request.headers.get('User-Agent') if request else None,
+            severity='warning'
+        )
+        
+        return True
+    
+    @staticmethod
+    def update_profile(user_id, data):
+        """
+        Update user profile.
+        
+        Args:
+            user_id: User ID
+            data: Profile data
+            
+        Returns:
+            dict: Updated user data
+            
+        Raises:
+            ValueError: Validation errors
+        """
+        user = User.query.get(user_id)
+        
+        if not user:
+            raise ValueError("User not found")
+        
+        allowed_fields = [
+            'full_name',
+            'bio',
+            'theme',
+            'notifications_enabled',
+            'marketing_emails',
         ]
+        
+        changes = []
+        for field in allowed_fields:
+            if field in data:
+                old_value = getattr(user, field)
+                new_value = data[field]
+                if field == 'theme' and new_value not in {'dark', 'light'}:
+                    raise ValueError('Theme must be dark or light')
+                if field in {'notifications_enabled', 'marketing_emails'} and not isinstance(new_value, bool):
+                    raise ValueError(f'{field} must be true or false')
+                if field in {'full_name', 'bio'}:
+                    if not isinstance(new_value, str):
+                        raise ValueError(f'{field} must be text')
+                    new_value = new_value.strip()
+                if old_value != new_value:
+                    setattr(user, field, new_value)
+                    changes.append(f'{field}: {old_value} -> {new_value}')
 
-        if sum(character_types) < cls.REQUIRED_CHARACTER_TYPES:
-            return False, (
-                "Password must use at least 3 of: uppercase, lowercase, "
-                "number, or symbol"
+        user.language = 'en'
+        
+        if changes:
+            db.session.commit()
+            
+            AuditService.log(
+                user_id=user.id,
+                action='profile_updated',
+                details=f'Updated profile: {", ".join(changes)}',
+                ip_address=request.remote_addr if request else None,
+                user_agent=request.headers.get('User-Agent') if request else None
             )
         
-        # Check for common passwords
-        if password.lower() in cls.COMMON_PASSWORDS:
-            return False, "Password is too common. Please choose a more secure password"
-        
-        # Check for repeated characters
-        if re.search(r'(.)\1{3,}', password):
-            return False, "Password contains too many repeated characters"
-        
-        # Check for sequential characters
-        if cls._has_sequential_chars(password):
-            return False, "Password contains sequential characters"
-        
-        return True, None
+        return user.to_dict()
     
-    @classmethod
-    def _has_sequential_chars(cls, password):
+    @staticmethod
+    def update_email(user_id, new_email, password):
         """
-        Check if password contains sequential characters.
+        Update user email.
         
         Args:
-            password: Password to check
+            user_id: User ID
+            new_email: New email
+            password: Password for verification
             
         Returns:
-            bool: True if sequential characters found
+            dict: Updated user data
+            
+        Raises:
+            ValueError: Validation errors
         """
-        password_lower = password.lower()
+        user = User.query.get(user_id)
         
-        # Check for sequential keyboard patterns
-        keyboard_patterns = [
-            'qwerty', 'asdfgh', 'zxcvbn', 'qwertyuiop',
-            'asdfghjkl', 'zxcvbnm', '1234567890', 'abcdefghijklmnopqrstuvwxyz'
-        ]
+        if not user:
+            raise ValueError("User not found")
         
-        for pattern in keyboard_patterns:
-            # Check forward and backward
-            for i in range(len(pattern) - 3):
-                segment = pattern[i:i+4]
-                if segment in password_lower:
-                    return True
-                if segment[::-1] in password_lower:
-                    return True
+        if not new_email or not password:
+            raise ValueError("Email and password are required")
         
-        return False
+        # Verify password
+        if not user.check_password(password):
+            raise ValueError("Invalid password")
+        
+        # Validate email
+        if not validate_email(new_email):
+            raise ValueError("Please provide a valid email address")
+        
+        # Check if email is taken
+        existing = User.query.filter_by(email=new_email.lower()).first()
+        if existing and existing.id != user.id:
+            raise ValueError("Email already registered")
+        
+        old_email = user.email
+        user.email = new_email.lower()
+        db.session.commit()
+        
+        AuditService.log(
+            user_id=user.id,
+            action='email_changed',
+            details=f'Changed email from {old_email} to {new_email}',
+            ip_address=request.remote_addr if request else None,
+            user_agent=request.headers.get('User-Agent') if request else None,
+            severity='warning'
+        )
+        
+        return user.to_dict()
     
-    @classmethod
-    def generate_strong_password(cls, length=16):
+    @staticmethod
+    def update_username(user_id, new_username):
         """
-        Generate a strong random password.
+        Update username.
         
         Args:
-            length: Password length
+            user_id: User ID
+            new_username: New username
             
         Returns:
-            str: Generated password
+            dict: Updated user data
+            
+        Raises:
+            ValueError: Validation errors
         """
-        # Define character sets
-        uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        lowercase = 'abcdefghijklmnopqrstuvwxyz'
-        digits = '0123456789'
-        special = '!@#$%^&*()_+-=[]{}|;:,.<>?'
+        user = User.query.get(user_id)
         
-        # Ensure at least one of each type
-        password = [
-            secrets.choice(uppercase),
-            secrets.choice(lowercase),
-            secrets.choice(digits),
-            secrets.choice(special)
-        ]
+        if not user:
+            raise ValueError("User not found")
         
-        # Fill the rest with random characters from all sets
-        all_chars = uppercase + lowercase + digits + special
-        password.extend(secrets.choice(all_chars) for _ in range(length - 4))
+        if not new_username:
+            raise ValueError("Username is required")
         
-        # Shuffle the password
-        secrets.SystemRandom().shuffle(password)
+        # Validate username
+        if not validate_username(new_username):
+            raise ValueError("Username must be 3-30 characters, alphanumeric with underscores")
         
-        return ''.join(password)
+        # Check if username is taken
+        existing = User.query.filter_by(username=new_username.lower()).first()
+        if existing and existing.id != user.id:
+            raise ValueError("Username already taken")
+        
+        old_username = user.username
+        user.username = new_username.lower()
+        db.session.commit()
+        
+        AuditService.log(
+            user_id=user.id,
+            action='username_changed',
+            details=f'Changed username from {old_username} to {new_username}',
+            ip_address=request.remote_addr if request else None,
+            user_agent=request.headers.get('User-Agent') if request else None
+        )
+        
+        return user.to_dict()
     
-    @classmethod
-    def hash_password(cls, password):
+    @staticmethod
+    def delete_account(user_id, password, confirm=False):
         """
-        Hash a password (delegates to Flask-Bcrypt).
+        Delete user account.
         
         Args:
-            password: Password to hash
+            user_id: User ID
+            password: Password for verification
+            confirm: Confirmation flag
             
         Returns:
-            str: Hashed password
+            bool: Success status
+            
+        Raises:
+            ValueError: Validation errors
         """
-        from extensions import bcrypt
-        return bcrypt.generate_password_hash(password).decode('utf-8')
+        user = User.query.get(user_id)
+        
+        if not user:
+            raise ValueError("User not found")
+        
+        if not password:
+            raise ValueError("Password is required to confirm account deletion")
+        
+        if not confirm:
+            raise ValueError("Please confirm account deletion")
+        
+        # Verify password
+        if not user.check_password(password):
+            raise ValueError("Invalid password")
+        
+        # Log deletion
+        AuditService.log(
+            user_id=user.id,
+            action='account_deleted',
+            details=f'User account deleted',
+            ip_address=request.remote_addr if request else None,
+            user_agent=request.headers.get('User-Agent') if request else None,
+            severity='critical'
+        )
+        
+        # Delete user
+        db.session.delete(user)
+        db.session.commit()
+        
+        return True
     
-    @classmethod
-    def check_password(cls, hashed_password, password):
+    @staticmethod
+    def get_user_by_id(user_id):
         """
-        Check a password against a hash.
+        Get user by ID.
         
         Args:
-            hashed_password: Hashed password
-            password: Password to check
+            user_id: User ID
             
         Returns:
-            bool: True if password matches
+            User: User object or None
         """
-        from extensions import bcrypt
-        return bcrypt.check_password_hash(hashed_password, password)
+        return User.query.get(user_id)
     
-    @classmethod
-    def get_password_strength(cls, password):
+    @staticmethod
+    def get_user_by_email(email):
         """
-        Calculate password strength score.
+        Get user by email.
         
         Args:
-            password: Password to evaluate
+            email: Email address
             
         Returns:
-            dict: Password strength data
+            User: User object or None
         """
-        score = 0
-        feedback = []
-        
-        # Check length
-        if len(password) >= 8:
-            score += 1
-            if len(password) >= 12:
-                score += 1
-        else:
-            feedback.append("Password is too short")
-        
-        # Check character variety
-        has_upper = bool(re.search(r'[A-Z]', password))
-        has_lower = bool(re.search(r'[a-z]', password))
-        has_digit = bool(re.search(r'\d', password))
-    has_special = bool(re.search(r'[^A-Za-z0-9\s]', password))
-        
-        variety_count = sum([has_upper, has_lower, has_digit, has_special])
-        score += variety_count
-        
-        if variety_count < 3:
-            feedback.append("Use more character types (uppercase, lowercase, numbers, special characters)")
-        
-        # Check for common passwords
-        if password.lower() in cls.COMMON_PASSWORDS:
-            score = 0
-            feedback.append("Password is too common")
-        
-        # Determine strength level
-        if score >= 7:
-            strength = 'strong'
-            level = 4
-        elif score >= 5:
-            strength = 'good'
-            level = 3
-        elif score >= 3:
-            strength = 'fair'
-            level = 2
-        else:
-            strength = 'weak'
-            level = 1
-        
-        return {
-            'score': score,
-            'max_score': 8,
-            'level': level,
-            'strength': strength,
-            'feedback': feedback,
-            'has_upper': has_upper,
-            'has_lower': has_lower,
-            'has_digit': has_digit,
-            'has_special': has_special,
-            'length': len(password)
-        }
+        return User.query.filter_by(email=email.lower()).first()
     
-    @classmethod
-    def get_policy_info(cls):
+    @staticmethod
+    def get_user_by_username(username):
         """
-        Get password policy information for display.
+        Get user by username.
         
+        Args:
+            username: Username
+            
         Returns:
-            dict: Policy information
+            User: User object or None
         """
-        requirements = []
+        return User.query.filter_by(username=username.lower()).first()
+    
+    @staticmethod
+    def is_admin(user_id):
+        """
+        Check if user is admin.
         
-        requirements.append(f"Minimum {cls.MIN_LENGTH} characters")
-        requirements.append(f"Maximum {cls.MAX_LENGTH} characters")
+        Args:
+            user_id: User ID
+            
+        Returns:
+            bool: True if admin
+        """
+        user = User.query.get(user_id)
+        return user and user.is_admin
+    
+    @staticmethod
+    def is_premium(user_id):
+        """
+        Check if user has premium access.
         
-        if cls.REQUIRE_UPPERCASE:
-            requirements.append("At least one uppercase letter")
-        if cls.REQUIRE_LOWERCASE:
-            requirements.append("At least one lowercase letter")
-        if cls.REQUIRE_DIGITS:
-            requirements.append("At least one number")
-        if cls.REQUIRE_SPECIAL:
-            requirements.append("At least one special character")
-        
-        return {
-            'min_length': cls.MIN_LENGTH,
-            'max_length': cls.MAX_LENGTH,
-            'require_uppercase': cls.REQUIRE_UPPERCASE,
-            'require_lowercase': cls.REQUIRE_LOWERCASE,
-            'require_digits': cls.REQUIRE_DIGITS,
-            'require_special': cls.REQUIRE_SPECIAL,
-            'requirements': requirements
-        }
+        Args:
+            user_id: User ID
+            
+        Returns:
+            bool: True if premium
+        """
+        user = User.query.get(user_id)
+        return user and user.is_premium()
