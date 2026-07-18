@@ -62,20 +62,16 @@ def validate_password(password):
     if len(password) < 8:
         return False
     
-    # At least one uppercase letter
-    if not re.search(r'[A-Z]', password):
-        return False
-    
-    # At least one lowercase letter
-    if not re.search(r'[a-z]', password):
-        return False
-    
-    # At least one number
-    if not re.search(r'\d', password):
-        return False
-    
-    # At least one special character
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+    # Require any three of four character types. This remains reasonably
+    # strong while accepting password-manager symbols such as _, -, +, /, =.
+    character_types = [
+        bool(re.search(r'[A-Z]', password)),
+        bool(re.search(r'[a-z]', password)),
+        bool(re.search(r'\d', password)),
+        bool(re.search(r'[^A-Za-z0-9\s]', password)),
+    ]
+
+    if sum(character_types) < 3:
         return False
     
     return True
