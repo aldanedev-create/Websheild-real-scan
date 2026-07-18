@@ -7,6 +7,7 @@ Handles report generation, export, and management.
 
 import json
 import os
+from io import BytesIO
 from datetime import datetime
 from flask import Blueprint, request, jsonify, current_app, send_file, render_template
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -190,17 +191,9 @@ def export_pdf(scan_id):
             metadata={'scan_id': scan_id, 'format': 'pdf'}
         )
         
-        # Save PDF to file
         filename = f"webshield_report_{scan_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pdf"
-        report_folder = current_app.config.get('REPORT_FOLDER')
-        os.makedirs(report_folder, exist_ok=True)
-        filepath = os.path.abspath(os.path.join(report_folder, filename))
-        
-        with open(filepath, 'wb') as f:
-            f.write(pdf_data)
-        
         return send_file(
-            filepath,
+            BytesIO(pdf_data),
             as_attachment=True,
             download_name=filename,
             mimetype='application/pdf'
