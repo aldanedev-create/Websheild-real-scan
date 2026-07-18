@@ -120,7 +120,7 @@ def register():
         if not validate_password(password):
             return jsonify({
                 'error': 'invalid_password',
-                'message': 'Password must be at least 8 characters with uppercase, lowercase, numbers, and a special character'
+                'message': 'Password must be at least 8 characters and use at least 3 of: uppercase, lowercase, number, or symbol'
             }), 400
         
         # Check if user exists
@@ -496,7 +496,7 @@ def change_password():
         if not validate_password(new_password):
             return jsonify({
                 'error': 'invalid_password',
-                'message': 'Password must be at least 8 characters with uppercase, lowercase, numbers, and a special character'
+                'message': 'Password must be at least 8 characters and use at least 3 of: uppercase, lowercase, number, or symbol'
             }), 400
         
         # Update password
