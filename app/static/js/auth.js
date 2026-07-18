@@ -94,7 +94,7 @@
 
         // Validate password strength
         if (!isValidPassword(password)) {
-            showError('Password must be at least 8 characters with uppercase, lowercase, numbers, and a special character.');
+            showError('Password must be at least 8 characters and use at least 3 of: uppercase, lowercase, number, or symbol.');
             return;
         }
 
@@ -195,7 +195,7 @@
         }
 
         if (!isValidPassword(password)) {
-            showError('Password must be at least 8 characters with uppercase, lowercase, numbers, and a special character.');
+            showError('Password must be at least 8 characters and use at least 3 of: uppercase, lowercase, number, or symbol.');
             return;
         }
 
@@ -241,11 +241,16 @@
     };
 
     function isValidPassword(password) {
-        return password.length >= 8 &&
-            /[a-z]/.test(password) &&
-            /[A-Z]/.test(password) &&
-            /\d/.test(password) &&
-            /[^a-zA-Z0-9]/.test(password);
+        if (password.length < 8) return false;
+
+        const characterTypes = [
+            /[a-z]/.test(password),
+            /[A-Z]/.test(password),
+            /\d/.test(password),
+            /[^a-zA-Z0-9\s]/.test(password)
+        ];
+
+        return characterTypes.filter(Boolean).length >= 3;
     }
 
     // ========================================
