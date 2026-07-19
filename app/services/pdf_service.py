@@ -7,6 +7,7 @@ Generates PDF reports from scan data.
 
 from datetime import datetime
 from html import escape
+import re
 from flask import current_app
 from app.services.report_triage import build_triage_data
 
@@ -32,25 +33,43 @@ class PDFService:
         Raises:
             Exception: PDF generation failed
         """
+        # ReportLab is fast and self-contained, which makes it the reliable
+        # primary engine on hosted Linux services such as Render. WeasyPrint is
+        # retained as a fallback for unusual report content.
         try:
-            # Generate HTML content
+            pdf_data = self._generate_reportlab_pdf(scan, findings)
+            return self._validate_pdf(pdf_data)
+        except Exception as reportlab_error:
+            current_app.logger.warning(
+                'ReportLab PDF generation failed; trying WeasyPrint: %s',
+                str(reportlab_error),
+            )
+
+        try:
+            from weasyprint import HTML
+
             html_content = self._generate_html(scan, findings)
-            
-            try:
-                from weasyprint import HTML
-                pdf_data = HTML(string=html_content, base_url=self.base_url).write_pdf()
-            except (ImportError, OSError) as exc:
-                current_app.logger.warning(
-                    "WeasyPrint is unavailable; using ReportLab PDF fallback: %s",
-                    str(exc),
-                )
-                pdf_data = self._generate_reportlab_pdf(scan, findings)
-            
-            return pdf_data
-            
-        except Exception as e:
-            current_app.logger.error(f'PDF generation error: {str(e)}')
-            raise Exception(f'Could not generate PDF: {str(e)}')
+            pdf_data = HTML(string=html_content, base_url=self.base_url).write_pdf()
+            return self._validate_pdf(pdf_data)
+        except Exception as exc:
+            current_app.logger.exception('All PDF generation engines failed')
+            raise RuntimeError(f'Could not generate PDF: {str(exc)}') from exc
+
+    @staticmethod
+    def _validate_pdf(pdf_data):
+        """Reject empty or invalid engine output before sending a download."""
+        if not isinstance(pdf_data, (bytes, bytearray)) or not pdf_data.startswith(b'%PDF-'):
+            raise ValueError('PDF engine returned invalid data')
+        return bytes(pdf_data)
+
+    @staticmethod
+    def _pdf_text(value, limit=None):
+        """Prepare scanner-controlled text for ReportLab's XML parser."""
+        text = '' if value is None else str(value)
+        text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', ' ', text)
+        if limit and len(text) > limit:
+            text = f'{text[:limit]}...'
+        return escape(text)
     
     def _generate_html(self, scan, findings):
         """
@@ -473,7 +492,7 @@ class PDFService:
             Paragraph('WebShield Security Report', title_style),
             Paragraph(f"Report ID: WS-{scan.id}-{datetime.utcnow().strftime('%Y%m%d')}", small_style),
             Paragraph(f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC", small_style),
-            Paragraph(f"Target: {escape(str(scan.target_url or ''))}", small_style),
+            Paragraph(f"Target: {self._pdf_text(scan.target_url, 2000)}", small_style),
             Spacer(1, 10),
         ]
 
@@ -490,7 +509,7 @@ class PDFService:
             ],
         ]
         story.append(self._table(summary_rows, [0.9, 0.9, 0.9, 0.9, 0.9, 0.9]))
-        story.append(Paragraph(escape(self._get_summary_text(scan)), body_style))
+        story.append(Paragraph(self._pdf_text(self._get_summary_text(scan), 4000), body_style))
 
         severity_rows = [
             ['Critical', 'High', 'Medium', 'Low', 'Info'],
@@ -512,9 +531,9 @@ class PDFService:
                 priority_rows.append([
                     str(group.get('priority_rank') or ''),
                     (group.get('severity') or 'info').upper(),
-                    Paragraph(escape(str(group.get('title') or 'Untitled finding')), small_style),
+                    Paragraph(self._pdf_text(group.get('title') or 'Untitled finding', 1000), small_style),
                     str(group.get('count') or 0),
-                    Paragraph(escape(str(group.get('first_seen_url') or '')), small_style),
+                    Paragraph(self._pdf_text(group.get('first_seen_url'), 2000), small_style),
                 ])
             story.append(self._table(priority_rows, [0.55, 0.7, 2.1, 0.55, 1.8]))
         else:
@@ -526,7 +545,7 @@ class PDFService:
             category_rows = [['Category', 'Instances', 'Groups', 'Highest']]
             for category in categories:
                 category_rows.append([
-                    Paragraph(escape(str(category.get('label') or category.get('category') or 'Uncategorized')), small_style),
+                    Paragraph(self._pdf_text(category.get('label') or category.get('category') or 'Uncategorized', 1000), small_style),
                     str(category.get('count') or 0),
                     str(category.get('group_count') or 0),
                     (category.get('highest_severity') or 'info').upper(),
@@ -537,7 +556,7 @@ class PDFService:
         story.append(Paragraph('Grouped Findings', section_style))
         for index, group in enumerate(triage.get('grouped_findings') or [], start=1):
             severity = (group.get('severity') or 'info').upper()
-            title = escape(str(group.get('title') or 'Untitled finding'))
+            title = self._pdf_text(group.get('title') or 'Untitled finding', 2000)
             story.append(Paragraph(f"{index}. [{severity}] {title}", finding_title_style))
             story.append(Paragraph(
                 f"{group.get('count', 0)} finding(s), {group.get('affected_url_count', 0)} affected URL(s)",
@@ -545,15 +564,15 @@ class PDFService:
             ))
 
             if group.get('description'):
-                story.append(Paragraph(f"<b>Description:</b> {escape(str(group.get('description')))}", body_style))
+                story.append(Paragraph(f"<b>Description:</b> {self._pdf_text(group.get('description'), 12000)}", body_style))
             if group.get('evidence_samples'):
-                story.append(Paragraph(f"<b>Evidence:</b> {escape(str(group['evidence_samples'][0]))}", small_style))
+                story.append(Paragraph(f"<b>Evidence:</b> {self._pdf_text(group['evidence_samples'][0], 8000)}", small_style))
             if group.get('recommendation'):
-                story.append(Paragraph(f"<b>Recommendation:</b> {escape(str(group.get('recommendation')))}", body_style))
+                story.append(Paragraph(f"<b>Recommendation:</b> {self._pdf_text(group.get('recommendation'), 12000)}", body_style))
 
             urls = group.get('affected_urls') or []
             if urls:
-                visible_urls = '<br/>'.join(escape(str(url)) for url in urls[:6])
+                visible_urls = '<br/>'.join(self._pdf_text(url, 2000) for url in urls[:6])
                 remaining = len(urls) - min(len(urls), 6)
                 if remaining:
                     visible_urls += f"<br/>+{remaining} more affected URL(s)"
