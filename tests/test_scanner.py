@@ -318,7 +318,7 @@ class TestJavaScriptAnalyzer:
             'scripts': [],
             'inline_scripts': [{
                 'content': """
-                    const firebaseKey = 'AIzaSyDabcdefghijklmnopqrstuvwxyz123456';
+                    const firebaseKey = 'well-something-key';
                     const name = new URLSearchParams(location.search).get('name');
                     document.querySelector('#profile').innerHTML = name;
                     window.parent.postMessage({ token: window.token }, '*');
