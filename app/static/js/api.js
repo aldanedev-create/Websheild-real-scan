@@ -488,7 +488,11 @@
             ),
             export: (scanId, format) => {
                 const safeFormat = ['html', 'pdf', 'json'].includes(format) ? format : 'json';
-                return this.download('/report/' + encodeURIComponent(scanId) + '/export/' + safeFormat);
+                return this.download(
+                    '/report/' + encodeURIComponent(scanId) + '/export/' + safeFormat,
+                    true,
+                    { timeout: safeFormat === 'pdf' ? 60000 : this.defaultTimeout }
+                );
             },
             share: (scanId) => this.post('/report/' + encodeURIComponent(scanId) + '/share')
         };
